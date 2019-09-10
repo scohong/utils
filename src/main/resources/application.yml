@@ -1,0 +1,36 @@
+server:
+  port: 8012
+
+spring:
+  application:
+    name: utils
+  datasource:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/pianchang2?autoReconnect=true&useSSL=false&serverTimezone=GMT%2B8&characterEncoding=UTF-8
+      username: root
+      password: huoguo
+
+  resources:
+    static-locations: classpath:/static/
+  mvc:
+    static-path-pattern: /**
+#用于添加多配置环境，dev表示为application-dev.properties配置文件生效
+#使用自定义配置文件，建议还是使用.properties格式
+#  profiles:
+#    active: dev
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+
+
+#.xml文件中用于获取自增主键
+#    use-generated-keys: true
+#    这里的classpath就是resources
+#  mapper-locations: classpath:*/*.xml
+
+#logging:
+#  level:
+#    com:
+#      huoguo:
+#        junengchi: debug
