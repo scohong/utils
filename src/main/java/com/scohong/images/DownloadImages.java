@@ -1,5 +1,7 @@
 package com.scohong.images;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -12,6 +14,7 @@ import java.net.URLConnection;
  * @Date: 2019/8/13 10:51
  * @Description:
  */
+@Slf4j
 public class DownloadImages {
 
     /**
@@ -24,6 +27,7 @@ public class DownloadImages {
      */
     public static void download(String urlString, String filename,String savePath) throws Exception {
         if (urlString == null || urlString.length() == 0 || "".equals(urlString) ) {
+            log.info(urlString + "下载失败");
             return;
         }
         System.out.println(urlString);

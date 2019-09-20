@@ -11,7 +11,7 @@ import java.util.List;
  */
 @Data
 public class PlaceDetail {
-    private String id;
+    private int id;
     private String cname;
     private String ename;
     private String oname;

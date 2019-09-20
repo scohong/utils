@@ -11,14 +11,14 @@ import java.util.List;
  * @Description:
  */
 @Data
-public class Program {
+public class ProgramSelector {
     private String value;
     private String label;
     @Builder.Default
     private boolean isLeaf = false;
-    List<Program> children;
+    List<ProgramSelector> children;
 
-    public Program(String value, String label) {
+    public ProgramSelector(String value, String label) {
         this.value = value;
         this.label = label;
     }

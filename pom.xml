@@ -47,6 +47,11 @@
             <artifactId>spring-boot-starter-web</artifactId>
             <version>2.0.4.RELEASE</version>
         </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>RELEASE</version>
+        </dependency>
         <!--swagger2-->
         <dependency>
             <groupId>io.springfox</groupId>
@@ -112,6 +117,12 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>2.9.9.3</version>
+        </dependency>
+        <!--图像压缩-->
+        <dependency>
+            <groupId>me.shaohui.advancedluban</groupId>
+            <artifactId>library</artifactId>
+            <version>1.3.5</version>
         </dependency>
 
     </dependencies>

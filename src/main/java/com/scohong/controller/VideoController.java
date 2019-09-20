@@ -1,12 +1,9 @@
 package com.scohong.controller;
 
-import com.scohong.entity.pianchangDO.Response;
-import com.scohong.entity.video.Program;
+import com.scohong.entity.video.ProgramSelector;
+import com.scohong.entity.video.Video;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -26,33 +23,40 @@ public class VideoController {
 
     //获取节目目录
     @GetMapping("/test")
-    public List<Program> test() {
-        List<Program> programs = new ArrayList<>();
+    public List<ProgramSelector> test() {
+        List<ProgramSelector> programSelectors = new ArrayList<>();
         File[] dirs = new File("E:\\下载\\资源\\").listFiles();
         for (File file: dirs
              ) {
-            List<Program> childProgram = new ArrayList<>();
-            Program program = new Program(file.getName(), file.getName());
+            List<ProgramSelector> childProgramSelector = new ArrayList<>();
+            ProgramSelector programSelector = new ProgramSelector(file.getName(), file.getName());
             File[] childFiles = new File("E:\\下载\\资源\\" + file.getName()).listFiles();
             for (File cFile: childFiles
                  ) {
-                childProgram.add(new Program(cFile.getName(), cFile.getName()));
+                childProgramSelector.add(new ProgramSelector(cFile.getName(), cFile.getName()));
             }
-            program.setChildren(childProgram);
-            programs.add(program);
+            programSelector.setChildren(childProgramSelector);
+            programSelectors.add(programSelector);
 
         }
-        return programs;
+        return programSelectors;
+    }
+
+    //获取节目目录
+    @PostMapping("/testaaa")
+    public List<ProgramSelector> testa(@RequestBody Video prefix) {
+        List<ProgramSelector> programSelectors = new ArrayList<>();
+        log.info(prefix.getWebsite());
+        return programSelectors;
     }
 
     //获取节目目录
     @GetMapping("/programs")
-    public List<Program> getProgramFile() {
-        List<Program> list = new ArrayList<>();
-
-        list.add(new Program("a","b"));
-        list.add(new Program("d","d"));
-        list.add(new Program("s","s"));
+    public List<ProgramSelector> getProgramFile() {
+        List<ProgramSelector> list = new ArrayList<>();
+        list.add(new ProgramSelector("a","b"));
+        list.add(new ProgramSelector("d","d"));
+        list.add(new ProgramSelector("s","s"));
         return list;
     }
     //获取剧集列表
