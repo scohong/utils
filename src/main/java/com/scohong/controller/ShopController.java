@@ -2,13 +2,11 @@ package com.scohong.controller;
 
 import com.scohong.dao.ShopDao;
 import com.scohong.entity.common.Response;
+import com.scohong.entity.junengchi.Shop;
 import com.scohong.utils.ResponseUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @Author: scohong
@@ -32,6 +30,16 @@ public class ShopController {
     public Response shopDel(@RequestParam int shopId) {
         boolean isSuccess = shopDao.delShop(shopId);
         if (isSuccess) {
+            return ResponseUtil.ok().setResult(shopDao.getAllShops());
+        } else {
+            return ResponseUtil.error().setMsg("删除失败");
+        }
+    }
+
+    @PostMapping("/update")
+    public Response updateShop(@RequestBody Shop shop) {
+        int isSuccess = shopDao.updateShop(shop);
+        if (isSuccess == 1) {
             return ResponseUtil.ok().setResult(shopDao.getAllShops());
         } else {
             return ResponseUtil.error().setMsg("删除失败");

@@ -38,11 +38,11 @@ public class ProgarmController {
         return ResponseUtil.ok().setResult(programDao.getAllProgram());
     }
 
-    @PostMapping("/add")
+    @PostMapping("/update")
     public Response updateProgram(@RequestBody Program program) {
         int isSuccess = programDao.updateProgram(program);
         log.info(isSuccess+"");
-        return ResponseUtil.ok();
+        return ResponseUtil.ok().setResult(programDao.getAllProgram());
     }
 
 }

@@ -1,11 +1,4 @@
-import com.scohong.Main;
-import com.scohong.entity.pianchangDO.*;
-import com.scohong.images.DownloadImages;
-import com.scohong.utils.PianchangUtil;
 import lombok.extern.slf4j.Slf4j;
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
 
 /**
  * @Author: scohong
@@ -19,7 +12,5 @@ public class Test {
         String name = "红楼梦";
         images = images.replaceAll("/images/pianchang/","/images/pianchang/" + name +"/");
         log.info(images);
-
-
     }
 }
