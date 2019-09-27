@@ -1,5 +1,6 @@
 package com.scohong.dao;
 
+import com.scohong.entity.junengchi.Program;
 import com.scohong.entity.pianchangDO.*;
 import org.apache.ibatis.annotations.*;
 
@@ -86,10 +87,10 @@ public interface PianchangDao {
     int addRecordDetail(PianchangRelateRecord record);
 
     //测试用
-    @Select("select ps.id,ps.images,p.name programName from program_shop ps,program p where ps.program_id = p.id and ps.id > 8900")
-    List<Tmp> getTmp();
+    @Select("select id programId,vertical_cover_pic from program where id > 28")
+    List<Program> getTmp();
 
     //测试更新
-    @Update("update  program_shop ps set images = #{images} where id = #{id}")
-    int updateTmp(String images,int id);
+    @Update("update  program  set vertical_cover_pic = #{coverPic}  where id = #{id}")
+    int updateTmp(String coverPic,int id);
 }

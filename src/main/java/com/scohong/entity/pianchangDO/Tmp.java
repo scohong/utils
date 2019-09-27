@@ -12,4 +12,5 @@ public class Tmp {
     private int id;
     private String images;
     private String programName;
+    private String thumbImages;
 }

@@ -1,7 +1,9 @@
 package com.scohong.controller;
 
+import com.google.common.base.Joiner;
 import com.scohong.Main;
 import com.scohong.dao.PianchangDao;
+import com.scohong.entity.junengchi.Program;
 import com.scohong.entity.pianchangDO.*;
 import com.scohong.images.DownloadImages;
 import com.scohong.utils.PianchangUtil;
@@ -205,23 +207,31 @@ public class PianchangController {
         return "hohoho";
     }
 
+    /**
+     * 更新片场的取景数据
+     * @return
+     */
     @GetMapping("/testa")
     public String changUrl() {
         int count = 0;
-        List<Tmp> tmps = pianchangDao.getTmp();
-        for (Tmp t:tmps
+        List<Program> tmps = pianchangDao.getTmp();
+        for (Program t:tmps
              ) {
             String name = t.getProgramName();
-            String images = t.getImages();
-            images = images.replaceAll("/images/pianchang/","/images/pianchang/" + name +"/");
+            String images = t.getCoverPic();
+            String thumbImages = t.getVerticalCoverPic();
+            String[] thumbSplit = thumbImages.split("/");
+            //转成list,在拼接成string
+            thumbSplit[3] += "/thumb";
+            thumbSplit[4] = "t_" + thumbSplit[4];
+            String res = Joiner.on('/').join(thumbSplit);
             //插入数据
-            log.info(""+count);
-            int success = pianchangDao.updateTmp(images,t.getId());
+            log.info(""+res);
+            int success = pianchangDao.updateTmp(res,t.getProgramId());
             if (success == 1) {
                 count++;
             }
         }
-        log.info("成功个数：" + count);
         return "ok";
     }
 }

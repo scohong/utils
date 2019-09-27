@@ -1,5 +1,7 @@
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.File;
+
 /**
  * @Author: scohong
  * @Date: 2019/8/13 14:42
@@ -7,10 +9,28 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class Test {
+    /**
+     * 删除文件 todo  递归遍历所有文件
+     * @param args
+     * @throws Exception
+     */
     public static void main(String[] args)throws  Exception {
-        String images = "/images/pianchang/红楼梦-黄山飞来石-cbbe.jpg;/images/pianchang/红楼梦-黄山飞来石-b484.jpg;/images/pianchang/红楼梦-黄山飞来石-7202.jpg;/images/pianchang/红楼梦-黄山飞来石-65af.jpg";
-        String name = "红楼梦";
-        images = images.replaceAll("/images/pianchang/","/images/pianchang/" + name +"/");
-        log.info(images);
+        File[] file = new File("D:\\剧能吃-备份数据\\pianchang\\").listFiles();
+        for (File f:file
+             ) {
+            for (File f2:f.listFiles()
+                 ) {
+                log.info(f2.getName());
+                if (f2.isDirectory()) {
+                    continue;
+                }
+                //获取文件大小(kb)
+                long size = f2.length() /1024;
+                log.info(f2.getName() + "大小：" + size/1024 +"k");
+                if (size > 50) {
+                    f2.delete();
+                }
+            }
+        }
     }
 }
