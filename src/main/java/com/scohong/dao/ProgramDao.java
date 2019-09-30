@@ -26,6 +26,9 @@ public interface ProgramDao {
             " types = #{types} ,introduction=#{introduction} ,actor = #{actor} where id = #{programId}")
     int  updateProgram(Program program);
 
+    @Select("SELECT  distinct `name` from program ")
+    List<String>  getProgramName();
+
     /**
      * @Description: 添加节目详情
      * @param program {@link Program}

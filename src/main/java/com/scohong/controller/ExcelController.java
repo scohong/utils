@@ -1,10 +1,8 @@
 package com.scohong.controller;
 
-import com.google.common.base.Joiner;
 import com.scohong.dao.FrameDao;
 import com.scohong.dao.ProgramDao;
 import com.scohong.dao.ShopDao;
-import com.scohong.entity.junengchi.Program;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.CellType;
@@ -13,7 +11,6 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -44,7 +41,6 @@ public class ExcelController {
     FrameDao frameDao;
 
     /**
-     *  todo 待封装成工具类，主要是mapper的注入问题
      * @param filePath
      * @return
      * @throws IOException
@@ -52,11 +48,15 @@ public class ExcelController {
     @PostMapping("/videoPathToSql")
     @ApiOperation(value = "注入视频字段")
     public boolean addFile(@RequestParam String filePath) throws IOException {
+        List<String> programNames = programDao.getProgramName();
         FileInputStream file = new FileInputStream(new File(filePath));
         Workbook workbook = new XSSFWorkbook(file);
         for (Sheet sheet:workbook
              ) {
-//            Sheet sheet = w;
+            String program = sheet.getSheetName();
+            if (!programNames.contains(program)) {
+                continue;
+            }
             log.info("开始处理文件：" + sheet.getSheetName());
             //获取节目id跟集数和商家名称进行定位
             String programName = sheet.getSheetName();
@@ -72,7 +72,8 @@ public class ExcelController {
                 log.info("行数："+i);
                 Row curRow = sheet.getRow(i);
                 curRow.getCell(0).setCellType(CellType.STRING);
-                if (curRow.getCell(0).getStringCellValue().length() == 0) {
+                //||curRow.getCell(0).getStringCellValue().length() == 0
+                if (curRow.getCell(0) == null ) {
                     continue;
                 }
                 int episode = 0;
@@ -80,6 +81,7 @@ public class ExcelController {
                     episode = Integer.parseInt(curRow.getCell(0).getStringCellValue());
                 } catch (NumberFormatException e) {
                     e.printStackTrace();
+                    continue;
                 }
                 String shopName = curRow.getCell(1).getStringCellValue();
                 curRow.getCell(9).setCellType(CellType.STRING);
@@ -90,6 +92,7 @@ public class ExcelController {
                     shopId = shopDao.getShopIdByName(shopName);
                 } catch (Exception e) {
                     e.printStackTrace();
+                    continue;
                 }
                 if (shopId == null || shopId == 0) {
                     continue;
@@ -102,6 +105,7 @@ public class ExcelController {
                 } catch (Exception e) {
                     log.info("" + shopName+episode);
                     e.printStackTrace();
+                    continue;
                 }
                 //没有记录则跳过
                 if ( recordId == null) {

@@ -23,8 +23,8 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
         //上传的图片在D盘下的OTA目录下，访问路径如：http://localhost:8081/OTA/d3cf0281-bb7f-40e0-ab77-406db95ccf2c.jpg
         //其中images表示访问的前缀。"file:E:\剧能吃\data\"是文件真实的存储路径
         //本地配置
-//        registry.addResourceHandler("/images/**").addResourceLocations("file:E:\\剧能吃\\data\\");
-        registry.addResourceHandler("/images/**").addResourceLocations("file:D:\\剧能吃-备份数据\\");
+        registry.addResourceHandler("/images/**").addResourceLocations("file:E:\\剧能吃\\data\\");
+//        registry.addResourceHandler("/images/**").addResourceLocations("file:D:\\剧能吃-备份数据\\");
         registry.addResourceHandler("/video/**").addResourceLocations("file:E:\\剧能吃\\video\\");
         registry.addResourceHandler("/backend/**").addResourceLocations("file:E:\\test\\");
         //服务器配置

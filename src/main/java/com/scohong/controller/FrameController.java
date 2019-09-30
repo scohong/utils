@@ -2,13 +2,11 @@ package com.scohong.controller;
 
 import com.scohong.dao.FrameDao;
 import com.scohong.entity.common.Response;
+import com.scohong.entity.junengchi.FrameData;
 import com.scohong.utils.ResponseUtil;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @Author: scohong
@@ -41,6 +39,20 @@ public class FrameController {
             return ResponseUtil.ok().setMsg("删除成功").setResult(frameDao.getAllFrameData());
         } else {
             return ResponseUtil.error().setMsg("删除失败").setResult(frameDao.getAllFrameData());
+        }
+    }
+
+    /**
+     * 更新取景数据
+     * @return
+     */
+    @PostMapping("/update")
+    public Response delAllData(@RequestBody FrameData frameData) {
+        boolean isSuccess = frameDao.updateFrameData(frameData);
+        if (isSuccess) {
+            return ResponseUtil.ok().setMsg("更新成功").setResult(frameDao.getAllFrameData());
+        } else {
+            return ResponseUtil.error().setMsg("更新失败").setResult(frameDao.getAllFrameData());
         }
     }
 
