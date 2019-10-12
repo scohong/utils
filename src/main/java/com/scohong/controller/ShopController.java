@@ -3,10 +3,10 @@ package com.scohong.controller;
 import com.scohong.constant.ImageManagment;
 import com.scohong.dao.ShopDao;
 import com.scohong.entity.common.Response;
-import com.scohong.entity.junengchi.Program;
 import com.scohong.entity.junengchi.Shop;
 import com.scohong.utils.FileUtil;
 import com.scohong.utils.ResponseUtil;
+import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +24,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/shop")
 @Slf4j
+@Api(tags = "商家branch")
 public class ShopController {
     @Autowired
     ShopDao shopDao;
