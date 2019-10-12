@@ -1,6 +1,7 @@
 package com.scohong.entity.common;
 
 
+import com.scohong.entity.junengchi.Pagination;
 
 /**
  * @Author: scohong
@@ -9,17 +10,24 @@ package com.scohong.entity.common;
  */
 
 public class Response<T> {
-
     private int code;
     private String msg;
     private T result;
+    private Pagination pagination;
 
+    public Pagination getPagination() {
+        return pagination;
+    }
 
     public Response<T> setCode(HttpCode httpCode){
         this.code = httpCode.code;
         return this;
     }
 
+    public Response<T> setPagination(Pagination pagination) {
+        this.pagination = pagination;
+        return this;
+    }
 
     public int getCode() {
         return code;

@@ -25,4 +25,19 @@ public class Program implements Serializable {
     private String thumbCoverPic;
     private String actor;
     private String label;
+
+    public Program() {
+    }
+
+    public Program(String name) {
+        this.programName = name;
+    }
+
+    public Program(String programName, String programAlias, String types, String introduction, String actor) {
+        this.programName = programName;
+        this.programAlias = programAlias;
+        this.types = types;
+        this.introduction = introduction;
+        this.actor = actor;
+    }
 }

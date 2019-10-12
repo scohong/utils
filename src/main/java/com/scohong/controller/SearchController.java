@@ -1,13 +1,8 @@
 package com.scohong.controller;
 
 import com.scohong.dao.FrameDao;
-import com.scohong.dao.ProgramDao;
-import com.scohong.entity.common.Response;
-import com.scohong.utils.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**

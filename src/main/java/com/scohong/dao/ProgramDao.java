@@ -16,13 +16,13 @@ import java.util.List;
 public interface ProgramDao {
 
     @Select("select id programId,`name` programName,alias programAlias,types,vertical_cover_pic,cover_pic,introduction,shop_nums,actor " +
-            " from program_test order by id")
+            " from program order by id")
     List<Program>  getAllProgram();
 
-    @Delete("DELETE from program_test where id = #{programId}")
+    @Delete("DELETE from program where id = #{programId}")
     int  delProgram(int programId);
 
-    @Update("UPDATE  program_test set `name` = #{programName},alias = #{programAlias} ," +
+    @Update("UPDATE  program set `name` = #{programName},alias = #{programAlias} ," +
             " types = #{types} ,introduction=#{introduction} ,actor = #{actor} where id = #{programId}")
     int  updateProgram(Program program);
 
@@ -34,7 +34,7 @@ public interface ProgramDao {
      * @param program {@link Program}
      * @return
      */
-    @Insert("INSERT INTO program_test(`name`,alias,types,vertical_cover_pic,cover_pic,thumb_cover_pic,introduction,hot,is_hot," +
+    @Insert("INSERT INTO program(`name`,alias,types,vertical_cover_pic,cover_pic,thumb_cover_pic,introduction,hot,is_hot," +
             "shop_nums,actor) VALUES (#{programName},#{programAlias} ,#{types} ,#{verticalCoverPic} ,#{coverPic} ,#{thumbCoverPic} ," +
             "#{introduction} ,#{hot} ,#{isHot} ,#{shopNums} ,#{actor} )")
     @Options(useGeneratedKeys=true)
@@ -45,7 +45,7 @@ public interface ProgramDao {
      * @param program {@link Program}
      * @return
      */
-    @Update("update program_test set `name`=#{programName},alias=#{progarmAlias},types=#{types},vertical_cover_pic=#{verticalCoverPic}," +
+    @Update("update program set `name`=#{programName},alias=#{progarmAlias},types=#{types},vertical_cover_pic=#{verticalCoverPic}," +
             "cover_pic=#{coverPic},thumb_cover_pic=#{thumbCoverPic},introduction=#{introduction},hot=#{hot} ,is_hot=#{isHot}," +
             "shop_nums=#{shopNums},actor=#{actor} ")
     @Options(useGeneratedKeys=true)
@@ -54,5 +54,18 @@ public interface ProgramDao {
     @Select("select id from program where name =#{name} ")
     Integer getProgramId(String name);
 
+    /**
+     * @Description: 根据节目名称获取详情
+     * @return
+     */
+    @Select("SELECT *,id programId,`name` programName FROM program where `name` = #{programName}")
+    Program getProgramByName(String programName);
+
+    /**
+     * @Description: 模糊搜索节目
+     * @return
+     */
+    @Select("SELECT *,id programId,`name` programName FROM program where `name`  like CONCAT('%',#{programName},'%')")
+    List<Program> searchProgramByName(String programName);
 
 }

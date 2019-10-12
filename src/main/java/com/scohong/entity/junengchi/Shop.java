@@ -16,4 +16,14 @@ public class Shop {
     private String introduction;
     private String coverPic;
     private String thumbCoverPic;
+
+    public Shop() {
+    }
+
+    public Shop(String shopName, String city, String address, String introduction) {
+        this.shopName = shopName;
+        this.city = city;
+        this.address = address;
+        this.introduction = introduction;
+    }
 }

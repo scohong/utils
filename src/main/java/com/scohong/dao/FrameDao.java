@@ -1,5 +1,6 @@
 package com.scohong.dao;
 
+import com.scohong.entity.junengchi.BackendProgramAndShop;
 import com.scohong.entity.junengchi.FrameData;
 import org.apache.ibatis.annotations.*;
 
@@ -16,7 +17,7 @@ public interface FrameDao {
      * @return
      */
     @Select("select s.name shopName,p.`name` programName,ps.* " +
-            "from program_shop_util ps,shop s,program p " +
+            "from program_shop ps,shop s,program p " +
             "where ps.shop_id = s.id and ps.program_id = p.id order by ps.id")
     List<FrameData> getAllFrameData();
 
@@ -25,7 +26,7 @@ public interface FrameDao {
      * @param id
      * @return
      */
-    @Delete("DELETE from program_shop_util where id = #{id}")
+    @Delete("DELETE from program_shop where id = #{id}")
     boolean delFrameData(int id);
 
     /**
@@ -33,7 +34,7 @@ public interface FrameDao {
      * @param
      * @return
      */
-    @Update("update program_shop_util set foods = #{foods} ,episode = #{episode},appear_time = #{appearTime}, " +
+    @Update("update program_shop set foods = #{foods} ,episode = #{episode},appear_time = #{appearTime}, " +
             "introduction = #{introduction}  where id = #{id}")
     boolean updateFrameData(FrameData frameData);
 
@@ -66,4 +67,16 @@ public interface FrameDao {
     @Select("select s.name shopName,p.`name` programName,ps.* from program_shop ps,program p,shop s where ps.shop_id = s.id and ps.program_id = p.id " +
             "and p.name like CONCAT('%',#{programName},'%') and s.name like CONCAT('%',#{shopName},'%')")
     List<FrameData> searchFrame(String programName, String shopName);
+
+    /**
+     * @Description: 添加取景数据
+     * @param data
+     * @return
+     */
+    @Insert("INSERT INTO program_shop(program_id,shop_id,foods,images,thumb_images,introduction,episode,appear_time, " +
+            "start_time,end_time) " +
+            "VALUES (#{programId},#{shopId},#{foods},#{images},#{thumbnails} ,#{introduction},#{episode} ,#{appearTime}, " +
+            "#{startTime} ,#{endTime}) ")
+    @Options(useGeneratedKeys=true)
+    boolean addFramedata(BackendProgramAndShop data);
 }

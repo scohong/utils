@@ -1,10 +1,7 @@
 package com.scohong.dao;
 
 import com.scohong.entity.junengchi.Shop;
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -12,16 +9,28 @@ import java.util.List;
 public interface ShopDao {
 
     @Select("select id shopId,`name` shopName,city,address,introduction,cover_pic,thumb_cover_pic " +
-            "from shop_test ")
+            "from shop ")
     List<Shop> getAllShops();
 
-    @Delete("delete from shop_test where id =#{shopId}")
+    @Insert("INSERT into shop(`name`,introduction,city,address,cover_pic) values (#{shopName},#{introduction} ,#{city}, " +
+            "#{address} ,#{coverPic} )")
+    boolean addShop(Shop shop);
+
+    @Delete("delete from shop where id =#{shopId}")
     boolean delShop(int shopId);
 
     @Select("select id  from shop where `name` = #{shopName}")
     Integer getShopIdByName(String name);
 
-    @Update("update shop_test set `name` = #{shopName},city = #{city},introduction = #{introduction}," +
+    @Select("select id shopId,`name` shopName,city,address,introduction,cover_pic,thumb_cover_pic " +
+            "from shop where `name` = #{shopName}")
+    Shop getShopByName(String name);
+
+    @Update("update shop set `name` = #{shopName},city = #{city},introduction = #{introduction}," +
             "address = #{address},cover_pic = #{coverPic} where id = #{shopId} ")
     Integer updateShop(Shop shop);
+
+    @Select("select id shopId,`name` shopName,city,address,introduction,cover_pic,thumb_cover_pic " +
+            "from shop where `name` like CONCAT('%',#{name},'%')")
+    List<Shop> searchShopByName(String name);
 }
