@@ -95,10 +95,10 @@ public class FrameController {
      * @return
      */
     @PostMapping("/add")
-    public Response addFramedata(@RequestParam(value = "image1") MultipartFile[] image1,
+    public Response addFramedata(@RequestParam(value = "image1",required = false) MultipartFile[] image1,
                                  @RequestParam(value = "image2",required = false) MultipartFile[] image2,
                                  @RequestParam(value = "image3",required = false) MultipartFile[] image3,
-                                 @RequestParam(value = "appearTime1", defaultValue = "")String appearTime1,
+                                 @RequestParam(value = "appearTime1", defaultValue = "",required = false)String appearTime1,
                                  @RequestParam(value = "appearTime2",required = false,defaultValue = "")String appearTime2,
                                  @RequestParam(value = "appearTime3",required = false,defaultValue = "")String appearTime3,
                                  @RequestParam(value = "startTime",required = false,defaultValue = "")String startTime,
@@ -115,7 +115,10 @@ public class FrameController {
             endTime = CommonUtils.formatTime(endTime);
         }
         //拼接取景时间
-        String appearTime = CommonUtils.formatTime(appearTime1);
+        String appearTime = "";
+        if (appearTime1.length() > 0) {
+            appearTime = CommonUtils.formatTime(appearTime1);
+        }
         if (appearTime2.length() > 0) {
             appearTime = appearTime.concat(",").concat(CommonUtils.formatTime(appearTime2));
             if (appearTime3.length() > 0) {
@@ -144,9 +147,11 @@ public class FrameController {
         //文件路径
         String saveLocalPath = ImageManagment.backendUpload.concat(framedata.getProgramName()).concat(File.separator);
         try {
-            FileUtil.saveFile(image1[0], savePath);
-            imagesPathList.add(saveLocalPath.concat(image1[0].getOriginalFilename()));
-            thumbImagesPathList.add(saveLocalPath.concat("t_").concat(image1[0].getOriginalFilename()));
+            if (image1.length > 0) {
+                FileUtil.saveFile(image1[0], savePath);
+                imagesPathList.add(saveLocalPath.concat(image1[0].getOriginalFilename()));
+                thumbImagesPathList.add(saveLocalPath.concat("t_").concat(image1[0].getOriginalFilename()));
+            }
             if (image2.length > 0) {
                 FileUtil.saveFile(image2[0], savePath);
                 imagesPathList.add(saveLocalPath.concat(image2[0].getOriginalFilename()));
