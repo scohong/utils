@@ -68,4 +68,23 @@ public interface ProgramDao {
     @Select("SELECT *,id programId,`name` programName FROM program where `name`  like CONCAT('%',#{programName},'%')")
     List<Program> searchProgramByName(String programName);
 
+    /**
+     * 更新节目宣传图
+     * @param coverPic
+     * @param programName
+     * @return
+     */
+    @Update("Update program set cover_pic = #{coverPic} where `name` = #{programName}")
+    boolean updateCoverPic(String coverPic, String programName);
+
+    /**
+     * 更新节目首页封面图
+     * @param verticalCoverPic
+     * @param programName
+     * @return
+     */
+    @Update("Update program set vertical_cover_pic = #{verticalCoverPic} where `name` = #{programName}")
+    boolean updateVerticalCoverPic(String verticalCoverPic, String programName);
+
+
 }

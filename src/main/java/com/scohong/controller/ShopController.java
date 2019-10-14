@@ -29,11 +29,20 @@ public class ShopController {
     @Autowired
     ShopDao shopDao;
 
+    /**
+     * 获取商家所有数据
+     * @return
+     */
     @GetMapping("/all")
     public Response getAllShops() {
         return ResponseUtil.ok().setResult(shopDao.getAllShops());
     }
 
+    /**
+     * 删除商家
+     * @param shopId
+     * @return
+     */
     @GetMapping("/del")
     public Response shopDel(@RequestParam int shopId) {
         boolean isSuccess = shopDao.delShop(shopId);
@@ -44,6 +53,11 @@ public class ShopController {
         }
     }
 
+    /**
+     * 商家搜索
+     * @param context
+     * @return
+     */
     @GetMapping("/search")
     public Response programSearch(@RequestParam String context) {
         if ("".equals(context)) {
@@ -53,6 +67,12 @@ public class ShopController {
         }
     }
 
+
+    /**
+     * 更新商家数据
+     * @param shop
+     * @return
+     */
     @PostMapping("/update")
     public Response updateShop(@RequestBody Shop shop) {
         int isSuccess = shopDao.updateShop(shop);
@@ -61,6 +81,32 @@ public class ShopController {
         } else {
             return ResponseUtil.error().setMsg("删除失败");
         }
+    }
+
+    /**
+     * 更新商家宣传图
+     * @return
+     */
+    @PostMapping("/updateCoverPic")
+    public Response updateShopCoverPic(@RequestParam("image") MultipartFile[] coverPic,
+                                       @RequestParam("shopName") String shopName) {
+        //在文件夹中添加封面图
+        String savePath = ImageManagment.realShopPath.concat(shopName);
+        //创建对应文件夹
+        File file = new File(savePath);
+        if (!file.isDirectory()) {
+            file.mkdir();
+        }
+        //保存图片
+        String coverPicPath = ImageManagment.relativeShopPath.concat(shopName).concat("/").concat(coverPic[0].getOriginalFilename());
+        try {
+            FileUtil.saveFile(coverPic[0], savePath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //更新数据库的图片数据
+        shopDao.updateShopCoverPic(shopName, coverPicPath);
+        return ResponseUtil.ok();
     }
 
     @PostMapping("/add")
@@ -75,7 +121,7 @@ public class ShopController {
         for (Shop s:shops
         ) {
             if (s.getShopName().equals(shopName)) {
-                return ResponseUtil.error().setMsg("该节目已存在，请重新输入");
+                return ResponseUtil.error().setMsg("该商家已存在，请重新输入");
             }
         }
         //在文件夹中添加封面图

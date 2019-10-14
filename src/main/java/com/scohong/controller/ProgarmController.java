@@ -61,6 +61,27 @@ public class ProgarmController {
         return ResponseUtil.ok().setResult(programDao.getAllProgram());
     }
 
+    @PostMapping("/updatePic")
+    public Response updateProgramPic(@RequestParam("image") MultipartFile[] files,
+                                     @RequestParam String programName,
+                                     @RequestParam String type) {
+        String savePath = ImageManagment.realImagesPath.concat(programName);
+        String coverPicPath = ImageManagment.backendUpload.concat(programName).concat("/").concat(files[0].getOriginalFilename());
+        //保存图片
+        try {
+            FileUtil.saveFile(files[0], savePath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if ("coverPic".equals(type)) {
+            //更新数据库
+            programDao.updateCoverPic(coverPicPath, programName);
+        }else {
+            programDao.updateVerticalCoverPic(coverPicPath, programName);
+        }
+        return ResponseUtil.ok().setResult(programDao.getAllProgram());
+    }
+
     /**
      *  添加节目
      *
@@ -83,14 +104,14 @@ public class ProgarmController {
                 return ResponseUtil.error().setMsg("该节目已存在，请重新输入");
             }
         }
-        //在文件夹中添加封面图
+        //在文件夹中添加封面图,真实路径
         String savePath = ImageManagment.realImagesPath.concat(name);
         //创建对应文件夹
         File file = new File(savePath);
         if (!file.isDirectory()) {
             file.mkdir();
         }
-        //保存图片
+        //保存图片，相对路径
         String coverPicPath = ImageManagment.backendUpload.concat(name).concat("/").concat(files[0].getOriginalFilename());
         String verticalCoverPicPath = ImageManagment.backendUpload.concat(name).concat("/").concat(verticalCoverPic[0].getOriginalFilename());
         try {

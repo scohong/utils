@@ -33,4 +33,7 @@ public interface ShopDao {
     @Select("select id shopId,`name` shopName,city,address,introduction,cover_pic,thumb_cover_pic " +
             "from shop where `name` like CONCAT('%',#{name},'%')")
     List<Shop> searchShopByName(String name);
+
+    @Update("update shop set cover_pic = #{coverPic} where `name` = #{shopName} ")
+    Integer updateShopCoverPic(String shopName,String coverPic);
 }
