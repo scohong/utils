@@ -47,14 +47,25 @@ public class ExcelController {
      * @throws IOException
      */
     @PostMapping("/videoPathToSql")
-    @ApiOperation(value = "注入视频字段")
+    @ApiOperation(value = "添加视频时间")
     public boolean addFile(@RequestParam String filePath) throws IOException {
+        List<String> originProgram = new ArrayList<>();
+        //先获取已有的视频节目，后续进行比对
+        File[] files = new File("E:\\剧能吃\\video\\").listFiles();
+        for (File f:files
+             ) {
+            originProgram.add(f.getName());
+        }
+
         List<String> programNames = programDao.getProgramName();
         FileInputStream file = new FileInputStream(new File(filePath));
         Workbook workbook = new XSSFWorkbook(file);
         for (Sheet sheet:workbook
              ) {
             String program = sheet.getSheetName();
+            if (!originProgram.contains(program)) {
+                continue;
+            }
             if (!programNames.contains(program)) {
                 continue;
             }
@@ -86,6 +97,7 @@ public class ExcelController {
                 }
                 String shopName = curRow.getCell(1).getStringCellValue();
                 curRow.getCell(9).setCellType(CellType.STRING);
+                //视频开始字符串
                 String startTime = curRow.getCell(9).getStringCellValue();
                 //获取商家id
                 Integer shopId = null;
@@ -114,16 +126,20 @@ public class ExcelController {
                 }
                 //开始拼接视频字符串
                 String video = "/video/"+programName+"/" + programName+"-"+episode+"-"+startTime+".mp4";
+                //去掉空数据
+                if (startTime == null || startTime.length() < 2) {
+                    video = "";
+                }
                 //插入数据库
                 Boolean isSuccess = frameDao.updateVideo(recordId, video);
                 if (isSuccess) {
+                    log.info(programName+"数据");
                     count++;
                 }
             }
             log.info("成功插入：" + count + "条数据");
             count = 0;
         }
-
         return true;
     }
 }

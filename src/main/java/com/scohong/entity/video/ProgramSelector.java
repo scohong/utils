@@ -6,6 +6,7 @@ import lombok.Data;
 import java.util.List;
 
 /**
+ * 获取节目目录，有二级目录
  * @Author: scohong
  * @Date: 2019/9/9 20:50
  * @Description:

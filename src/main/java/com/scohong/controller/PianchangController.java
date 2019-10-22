@@ -1,7 +1,6 @@
 package com.scohong.controller;
 
 import com.google.common.base.Joiner;
-import com.scohong.Main;
 import com.scohong.dao.PianchangDao;
 import com.scohong.entity.junengchi.Program;
 import com.scohong.entity.pianchangDO.*;

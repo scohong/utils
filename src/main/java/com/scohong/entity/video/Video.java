@@ -9,5 +9,10 @@ import lombok.Data;
  */
 @Data
 public class Video {
-    private String website;
+    private int frameId;
+    private String[] program;
+    private String videoStartTime;
+    private String videoEndTime;
+    private String gifStartTime;
+    private String gifEndTime;
 }

@@ -1,12 +1,14 @@
 package com.scohong.controller;
 
-import com.scohong.constant.ImageManagment;
+import com.scohong.constant.ConfigManagment;
 import com.scohong.dao.ProgramDao;
 import com.scohong.entity.common.Response;
 import com.scohong.entity.junengchi.Program;
 import com.scohong.utils.FileUtil;
+import com.scohong.utils.ImageUtil;
 import com.scohong.utils.ResponseUtil;
 import lombok.extern.slf4j.Slf4j;
+import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -65,11 +67,23 @@ public class ProgarmController {
     public Response updateProgramPic(@RequestParam("image") MultipartFile[] files,
                                      @RequestParam String programName,
                                      @RequestParam String type) {
-        String savePath = ImageManagment.realImagesPath.concat(programName);
-        String coverPicPath = ImageManagment.backendUpload.concat(programName).concat("/").concat(files[0].getOriginalFilename());
+        String savePath = ConfigManagment.realImagesPath.concat(programName);
+        String coverPicPath = ConfigManagment.backendUpload.concat(programName).concat("/").concat(files[0].getOriginalFilename());
         //保存图片
         try {
-            FileUtil.saveFile(files[0], savePath);
+            String truePath = FileUtil.saveFile(files[0], savePath);
+            //png格式下转成jpg，再压缩，数据库路径要换成jpg
+            //获取转换后的真实路径
+            truePath = ImageUtil.pngTojpgFile(new File(truePath));
+            //生成缩略图
+            Thumbnails.of(new File(truePath))
+                    .scale(1)
+                    .toFile(truePath);
+            log.info(coverPicPath);
+            //将数据库的相对路径png数据换成jpg
+            if (coverPicPath.indexOf("png") != -1) {
+                coverPicPath = coverPicPath.replaceAll("png", "jpg");
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -105,16 +119,17 @@ public class ProgarmController {
             }
         }
         //在文件夹中添加封面图,真实路径
-        String savePath = ImageManagment.realImagesPath.concat(name);
+        String savePath = ConfigManagment.realImagesPath.concat(name);
         //创建对应文件夹
         File file = new File(savePath);
         if (!file.isDirectory()) {
             file.mkdir();
         }
         //保存图片，相对路径
-        String coverPicPath = ImageManagment.backendUpload.concat(name).concat("/").concat(files[0].getOriginalFilename());
-        String verticalCoverPicPath = ImageManagment.backendUpload.concat(name).concat("/").concat(verticalCoverPic[0].getOriginalFilename());
+        String coverPicPath = ConfigManagment.backendUpload.concat(name).concat("/").concat(files[0].getOriginalFilename());
+        String verticalCoverPicPath = ConfigManagment.backendUpload.concat(name).concat("/").concat(verticalCoverPic[0].getOriginalFilename());
         try {
+            //真实路径
             FileUtil.saveFile(files[0], savePath);
             FileUtil.saveFile(verticalCoverPic[0], savePath);
         } catch (IOException e) {

@@ -15,6 +15,7 @@ public class FrameData {
     private String programName;
     private String shopName;
     private String video;
+    private String gif;
     private String foods;
     private String introduction;
     private int episode;

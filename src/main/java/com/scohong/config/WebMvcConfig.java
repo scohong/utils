@@ -26,7 +26,10 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
         registry.addResourceHandler("/images/**").addResourceLocations("file:E:\\剧能吃\\data\\");
 //        registry.addResourceHandler("/images/**").addResourceLocations("file:D:\\剧能吃-备份数据\\");
         registry.addResourceHandler("/video/**").addResourceLocations("file:E:\\剧能吃\\video\\");
+        registry.addResourceHandler("/gif/**").addResourceLocations("file:E:\\剧能吃\\gif\\");
         registry.addResourceHandler("/backend/**").addResourceLocations("file:E:\\test\\");
+        /**本地纪录片资源映射地址*/
+        registry.addResourceHandler("/record/**").addResourceLocations("file:D:\\剧能吃-纪录片\\");
         //服务器配置
 //        registry.addResourceHandler("/images/**").addResourceLocations("file:/images/");
 //        registry.addResourceHandler("/video/**").addResourceLocations("file:/video/");

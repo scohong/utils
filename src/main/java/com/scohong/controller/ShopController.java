@@ -1,6 +1,6 @@
 package com.scohong.controller;
 
-import com.scohong.constant.ImageManagment;
+import com.scohong.constant.ConfigManagment;
 import com.scohong.dao.ShopDao;
 import com.scohong.entity.common.Response;
 import com.scohong.entity.junengchi.Shop;
@@ -91,14 +91,14 @@ public class ShopController {
     public Response updateShopCoverPic(@RequestParam("image") MultipartFile[] coverPic,
                                        @RequestParam("shopName") String shopName) {
         //在文件夹中添加封面图
-        String savePath = ImageManagment.realShopPath.concat(shopName);
+        String savePath = ConfigManagment.realShopPath.concat(shopName);
         //创建对应文件夹
         File file = new File(savePath);
         if (!file.isDirectory()) {
             file.mkdir();
         }
         //保存图片
-        String coverPicPath = ImageManagment.relativeShopPath.concat(shopName).concat("/").concat(coverPic[0].getOriginalFilename());
+        String coverPicPath = ConfigManagment.relativeShopPath.concat(shopName).concat("/").concat(coverPic[0].getOriginalFilename());
         try {
             FileUtil.saveFile(coverPic[0], savePath);
         } catch (IOException e) {
@@ -125,14 +125,14 @@ public class ShopController {
             }
         }
         //在文件夹中添加封面图
-        String savePath = ImageManagment.realShopPath.concat(shopName);
+        String savePath = ConfigManagment.realShopPath.concat(shopName);
         //创建对应文件夹
         File file = new File(savePath);
         if (!file.isDirectory()) {
             file.mkdir();
         }
         //保存图片
-        String coverPicPath = ImageManagment.relativeShopPath.concat(shopName).concat("/").concat(coverPic[0].getOriginalFilename());
+        String coverPicPath = ConfigManagment.relativeShopPath.concat(shopName).concat("/").concat(coverPic[0].getOriginalFilename());
         try {
             FileUtil.saveFile(coverPic[0], savePath);
         } catch (IOException e) {

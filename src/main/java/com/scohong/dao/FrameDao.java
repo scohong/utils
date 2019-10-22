@@ -79,4 +79,22 @@ public interface FrameDao {
             "#{startTime} ,#{endTime}) ")
     @Options(useGeneratedKeys=true)
     boolean addFramedata(BackendProgramAndShop data);
+
+    /**
+     * 根据id获取取景数据
+     */
+    @Select("SELECT thumb_images from program_shop where id = #{id}")
+    String getImageById(String id);
+
+    /**
+     * 更新取景图片
+     */
+    @Update("update program_shop set thumb_images = #{images} where id = #{id}")
+    int updateImageById(String id,String images);
+
+    /**
+     * 更新gif和video数据
+     */
+    @Update("update program_shop set gif = #{gifPath} , video = #{videoPath} where id = #{id}")
+    int updateVideoAndGifById(int id,String videoPath,String gifPath);
 }

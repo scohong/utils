@@ -13,7 +13,7 @@ public interface ShopDao {
     List<Shop> getAllShops();
 
     @Insert("INSERT into shop(`name`,introduction,city,address,cover_pic) values (#{shopName},#{introduction} ,#{city}, " +
-            "#{address} ,#{coverPic} )")
+            "#{address},#{coverPic}  )")
     boolean addShop(Shop shop);
 
     @Delete("delete from shop where id =#{shopId}")
@@ -27,7 +27,7 @@ public interface ShopDao {
     Shop getShopByName(String name);
 
     @Update("update shop set `name` = #{shopName},city = #{city},introduction = #{introduction}," +
-            "address = #{address},cover_pic = #{coverPic} where id = #{shopId} ")
+            "address = #{address} where id = #{shopId} ")
     Integer updateShop(Shop shop);
 
     @Select("select id shopId,`name` shopName,city,address,introduction,cover_pic,thumb_cover_pic " +

@@ -1,8 +1,16 @@
 package com.scohong.controller;
 
+import com.scohong.constant.ConfigManagment;
+import com.scohong.dao.FrameDao;
+import com.scohong.entity.common.Response;
 import com.scohong.entity.video.ProgramSelector;
 import com.scohong.entity.video.Video;
+import com.scohong.utils.CommonUtils;
+import com.scohong.utils.ResponseUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import java.io.BufferedReader;
 import java.io.File;
@@ -10,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @Author: scohong
@@ -18,47 +27,30 @@ import java.util.List;
  */
 @RestController
 @Slf4j
+@RequestMapping("/localDir")
 public class VideoController {
-
-
+    @Autowired
+    FrameDao frameDao;
     //获取节目目录
-    @GetMapping("/test")
-    public List<ProgramSelector> test() {
+    @GetMapping("/record")
+    public List<ProgramSelector> localRecordList() {
         List<ProgramSelector> programSelectors = new ArrayList<>();
-        File[] dirs = new File("E:\\下载\\资源\\").listFiles();
+        File[] dirs = new File(ConfigManagment.RECORDLOCALDIR).listFiles();
         for (File file: dirs
              ) {
             List<ProgramSelector> childProgramSelector = new ArrayList<>();
             ProgramSelector programSelector = new ProgramSelector(file.getName(), file.getName());
-            File[] childFiles = new File("E:\\下载\\资源\\" + file.getName()).listFiles();
+            File[] childFiles = new File(ConfigManagment.RECORDLOCALDIR + file.getName()).listFiles();
             for (File cFile: childFiles
                  ) {
                 childProgramSelector.add(new ProgramSelector(cFile.getName(), cFile.getName()));
             }
             programSelector.setChildren(childProgramSelector);
             programSelectors.add(programSelector);
-
         }
         return programSelectors;
     }
 
-    //获取节目目录
-    @PostMapping("/testaaa")
-    public List<ProgramSelector> testa(@RequestBody Video prefix) {
-        List<ProgramSelector> programSelectors = new ArrayList<>();
-        log.info(prefix.getWebsite());
-        return programSelectors;
-    }
-
-    //获取节目目录
-    @GetMapping("/programs")
-    public List<ProgramSelector> getProgramFile() {
-        List<ProgramSelector> list = new ArrayList<>();
-        list.add(new ProgramSelector("a","b"));
-        list.add(new ProgramSelector("d","d"));
-        list.add(new ProgramSelector("s","s"));
-        return list;
-    }
     //获取剧集列表
     //获取处理后的视频
     //播放处理后的视频
@@ -66,38 +58,72 @@ public class VideoController {
 
     /**
      *  手动剪辑视频
-     * @param program
-     * @param episode
-     * @param startTime
-     * @param endTime
      * @return
      */
     @PostMapping("/cutVideo")
-    public String cutVideo(@RequestParam String program,
-                           @RequestParam String episode,
-                           @RequestParam String startTime,
-                           @RequestParam String endTime) {
-        String path = "E:\\test\\" + program + File.separator + episode;
-        // TODO Auto-generated method stub
+    @Transactional
+    public Response cutVideo(@RequestBody Video video) {
+        log.info(video.toString());
+        String localVideoDir = ConfigManagment.VIDEOCUTDIR;
+        String localGifDir = ConfigManagment.GIFCUTDIR;
+        String videoOutPath = localVideoDir+video.getProgram()[0]+File.separator;
+        String gifOutPath = localGifDir+video.getProgram()[0]+File.separator;
+        //没有目录就创建
+        File videoDir = new File(videoOutPath);
+        File gifDir = new File(gifOutPath);
+        if (!videoDir.isDirectory()) {
+            //多级路径没有，用mkdirs，只有一级路径用mkdir
+            videoDir.mkdirs();
+        }
+        if (!gifDir.isDirectory()) {
+            gifDir.mkdirs();
+        }
+        String videoName = UUID.randomUUID().toString().substring(0,8);
+        String videoFile = videoOutPath + videoName + ".mp4";
+        String gifName = UUID.randomUUID().toString().substring(0,8);
+        String gifFile = gifOutPath + gifName + ".gif";
+        //转换时间
+        int videoStartTime = CommonUtils.getSecond(video.getVideoStartTime());
+        int videoEndTime = CommonUtils.getSecond(video.getVideoEndTime());
+        int gifStartTime = CommonUtils.getSecond(video.getGifStartTime());
+        int gifEndTime = CommonUtils.getSecond(video.getGifEndTime());
+        if (videoEndTime <= videoStartTime || gifEndTime <= gifStartTime) {
+            return ResponseUtil.error().setMsg("结束时间大于起始时间，请重新选择！");
+        }
+        String program = video.getProgram()[0];
+        String file = video.getProgram()[1];
+        String filePath = ConfigManagment.RECORDLOCALDIR + program+File.separator+file;
+//        // TODO Auto-generated method stub
         try {
-//            Runtime.getRuntime().exec("source activate ");// 执行py文件
-//            Runtime.getRuntime().exec("python F:\\workspace\\python\\test.py");// 执行py文件
-            String[] args = new String[] { "D:\\Anaconda\\python.exe", "F:/workspace/python/test.py", path,startTime,endTime };
-            Process proc = Runtime.getRuntime().exec(args);
-            //用输入输出流来截取结果
-            BufferedReader in = new BufferedReader(new InputStreamReader(proc.getInputStream()));
-            String line = null;
-            while ((line = in.readLine()) != null) {
-                System.out.println(line);
-            }
-            log.info("res:"+line);
-            in.close();
+            /**py脚本
+             * 'ffmpeg -i "{video_path}" -ss {start_time} -c copy -to {end_time} -codec:a aac "{out_path}"'
+             * */
+            /** 剪视频*/
+            String[] cutVideo = new String[] { "D:\\Anaconda\\python.exe", "F:/workspace/python/cutVideo.py",
+                    filePath, String.valueOf(videoStartTime), String.valueOf(videoEndTime - videoStartTime), videoFile};
+            Process proc = Runtime.getRuntime().exec(cutVideo);
             proc.waitFor();
+            //用输入输出流来截取结果
+            /** 剪gif*/
+            String[] cutGif = new String[] { "D:\\Anaconda\\python.exe", "F:/workspace/python/cutGif.py",
+                    filePath,String.valueOf(gifStartTime), String.valueOf(gifEndTime - gifStartTime), gifFile};
+            Process procGif = Runtime.getRuntime().exec(cutGif);
+            procGif.waitFor();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return "处理完成";
+
+            /**更新sql的gif和video数据*/
+        String videoSqlPath = ConfigManagment.VIDEOSQLDIR + video.getProgram()[0] +"/"+ videoName + ".mp4";
+        String gifSqlPath = ConfigManagment.GIFSQLDIR + video.getProgram()[0] + "/" + gifName + ".gif";
+        int i = frameDao.updateVideoAndGifById(video.getFrameId(), videoSqlPath, gifSqlPath);
+        if (i == 1) {
+            return ResponseUtil.ok();
+        } else {
+            return ResponseUtil.error().setMsg("数据更新失败，请联系小洪");
+        }
     }
+
 }

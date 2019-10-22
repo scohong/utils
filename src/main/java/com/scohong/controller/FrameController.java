@@ -1,7 +1,7 @@
 package com.scohong.controller;
 
 import com.google.common.base.Joiner;
-import com.scohong.constant.ImageManagment;
+import com.scohong.constant.ConfigManagment;
 import com.scohong.dao.FrameDao;
 import com.scohong.dao.ProgramDao;
 import com.scohong.dao.ShopDao;
@@ -12,8 +12,10 @@ import com.scohong.entity.junengchi.Program;
 import com.scohong.entity.junengchi.Shop;
 import com.scohong.utils.CommonUtils;
 import com.scohong.utils.FileUtil;
+import com.scohong.utils.ImageUtil;
 import com.scohong.utils.ResponseUtil;
 import lombok.extern.slf4j.Slf4j;
+import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -77,6 +79,42 @@ public class FrameController {
     }
 
     /**
+     * 更新商家宣传图
+     * @return
+     */
+    @PostMapping("/addFramePic")
+    public Response addFramePic(@RequestParam("image") MultipartFile[] coverPic,
+                                       @RequestParam("frameId") String frameId,
+                                       @RequestParam("programName") String programName) {
+        //在文件夹中添加封面图
+        String savePath = ConfigManagment.realImagesPath.concat(programName);
+        //创建对应文件夹
+        File file = new File(savePath);
+        if (!file.isDirectory()) {
+            file.mkdir();
+        }
+        //保存图片
+        //获取原有的图片路径
+        String oriImages = frameDao.getImageById(frameId);
+        String coverPicPath = ConfigManagment.imageLoadPath.concat(programName).concat("/").concat(coverPic[0].getOriginalFilename());
+        //有记录
+        if (oriImages != null) {
+            if (oriImages.length() > 5) {
+                coverPicPath = oriImages.concat(";").concat(coverPicPath);
+            }
+        }
+
+        try {
+            FileUtil.saveFile(coverPic[0], savePath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //更新数据库的图片数据
+        frameDao.updateImageById(frameId, coverPicPath);
+        return ResponseUtil.ok();
+    }
+
+    /**
      * 搜索取景数据
      * @param programName
      * @param shopName
@@ -133,7 +171,7 @@ public class FrameController {
         framedata.setProgramId(program.getProgramId());
         //保存图片和更新图片地址
         //1.找到对应的文件夹
-        String savePath = ImageManagment.realImagesPath.concat(framedata.getProgramName());
+        String savePath = ConfigManagment.realImagesPath.concat(framedata.getProgramName());
         //创建对应文件夹
         File file = new File(savePath);
         if (!file.isDirectory()) {
@@ -145,12 +183,30 @@ public class FrameController {
         List<String> thumbImagesPathList = new ArrayList<>();
         //2.保存图片
         //文件路径
-        String saveLocalPath = ImageManagment.backendUpload.concat(framedata.getProgramName()).concat(File.separator);
+        String saveLocalPath = ConfigManagment.backendUpload.concat(framedata.getProgramName()).concat(File.separator);
         try {
             if (image1.length > 0) {
-                FileUtil.saveFile(image1[0], savePath);
+                String truePath = FileUtil.saveFile(image1[0], savePath);
+                //png格式下转成jpg，再压缩，数据库路径要换成jpg
+                //获取转换后的真实路径
+                truePath = ImageUtil.pngTojpgFile(new File(truePath));
+                //生成缩略图
+                Thumbnails.of(new File(truePath))
+                        .scale(1)
+                        .toFile(savePath
+                                .concat(File.separator)
+                                .concat("t_")
+                                .concat(image1[0].getOriginalFilename()
+                                        .replaceAll("png","jpg")));
                 imagesPathList.add(saveLocalPath.concat(image1[0].getOriginalFilename()));
-                thumbImagesPathList.add(saveLocalPath.concat("t_").concat(image1[0].getOriginalFilename()));
+                String thumbPicPath = saveLocalPath.concat("t_").concat(image1[0].getOriginalFilename());
+                log.info(thumbPicPath);
+                //将数据库的相对路径png数据换成jpg
+                if (thumbPicPath.indexOf("png") != -1) {
+                    thumbPicPath = thumbPicPath.replaceAll("png", "jpg");
+                }
+                thumbImagesPathList.add(thumbPicPath);
+
             }
             if (image2.length > 0) {
                 FileUtil.saveFile(image2[0], savePath);
@@ -166,7 +222,7 @@ public class FrameController {
             e.printStackTrace();
         }
         String imageSql = Joiner.on(";").join(imagesPathList);
-        String thumbImageSql = Joiner.on(";").join(imagesPathList);
+        String thumbImageSql = Joiner.on(";").join(thumbImagesPathList);
         //3.更新图片路径
         framedata.setImages(imageSql);
         framedata.setThumbnails(thumbImageSql);

@@ -2,6 +2,7 @@ package com.scohong.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
+import org.junit.Test;
 
 import java.sql.Timestamp;
 import java.text.ParseException;
@@ -29,6 +30,36 @@ public class CommonUtils {
         return sdf.format(timestamp);
     }
 
+    @Test
+    /**
+     * 2019-10-10T00:03:14.000Z";
+     * 获取秒数
+     */
+    public static int getSecond(String date) {
+//        date = "2019-10-21T00:00:02.000Z";
+        DateTime dateTime = null;
+        try {
+            SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
+            Date d = format.parse(date.substring(11,19));
+            d.setHours(0);
+            dateTime = new DateTime(d);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return dateTime.getSecondOfDay();
+    }
+
+    public static void main(String[] args) {
+        log.info(getSecond("") + "");
+    }
+
+
+    /**
+     * 格式化ant-design时间
+     * 2019-10-21T16:02:02.000Z","endTime":"2019-10-21T18:03:05.000Z
+     * @param strDate
+     * @return
+     */
     public static String formatTime(String strDate)  {
         strDate = strDate.replace("GMT", "").replaceAll("\\(.*\\)", "");
         SimpleDateFormat format = new SimpleDateFormat("EEE MMM dd yyyy hh:mm:ss", Locale.ENGLISH);
