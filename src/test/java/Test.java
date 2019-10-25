@@ -1,10 +1,13 @@
+import com.google.common.hash.Hashing;
 import com.scohong.constant.ConfigManagment;
 import com.scohong.utils.ImageUtil;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
+import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.UUID;
 
 /**
  * @Author: scohong
@@ -23,17 +26,35 @@ public class Test {
 //        String dir = "D:\\剧能吃-压缩图片\\";
 //            int num = diguiFile(new File(dir),0);
 //        System.out.println("del:" + num);
-        String outDir = ConfigManagment.VIDEOCUTDIR;
-        String videoOutPath = outDir+"abc"+"\\video\\";
-        log.info(videoOutPath);
-        String gifOutPath = outDir+"abc"+"/gif/";
-        //没有目录就创建
-        File videoDir = new File(videoOutPath);
-        File gifDir = new File(gifOutPath);
-        if (!videoDir.isDirectory()) {
-            log.info("video创建目录");
-            videoDir.mkdirs();
-        }
+//        String outDir = ConfigManagment.VIDEOCUTDIR;
+//        String videoOutPath = outDir+"abc"+"\\video\\";
+//        log.info(videoOutPath);
+//        String gifOutPath = outDir+"abc"+"/gif/";
+//        //没有目录就创建
+//        File videoDir = new File(videoOutPath);
+//        File gifDir = new File(gifOutPath);
+//        if (!videoDir.isDirectory()) {
+//            log.info("video创建目录");
+//            videoDir.mkdirs();
+//        }
+
+        //压缩文件
+//        File file = new File("E:\\剧能吃\\新建文件夹 (2)\\");
+//        for (File f:file.listFiles()
+//             ) {
+//            String newFileName = f.getName().replaceAll(".png", "");
+//            Thumbnails
+//                    .of(f)
+//                    .scale(1)
+//                    .outputFormat("jpg")
+//                    .outputQuality(0.8)
+//                    .toFile(f.getParent().concat(File.separator).concat("/t_").concat(newFileName));
+//        }
+
+        String s = "E:\\剧能吃\\data\\shops\\Bar Rouge\\C2.jpg";
+        File file = new File(s);
+        System.out.println(file.isFile());
+
     }
 
     public static void thumbFile(File file) {

@@ -193,11 +193,11 @@ public class FrameController {
                 //生成缩略图
                 Thumbnails.of(new File(truePath))
                         .scale(1)
+                        .outputFormat("jpg")
                         .toFile(savePath
                                 .concat(File.separator)
                                 .concat("t_")
-                                .concat(image1[0].getOriginalFilename()
-                                        .replaceAll("png","jpg")));
+                                .concat(image1[0].getOriginalFilename()));
                 imagesPathList.add(saveLocalPath.concat(image1[0].getOriginalFilename()));
                 String thumbPicPath = saveLocalPath.concat("t_").concat(image1[0].getOriginalFilename());
                 log.info(thumbPicPath);

@@ -1,9 +1,9 @@
 package com.scohong.utils;
 
+import com.scohong.entity.common.Response;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 
 /**
  * @Author: scohong
@@ -43,4 +43,47 @@ public class FileUtil {
         String type = fileType.split("/")[0];
         return type.equals("image");
     }
+
+
+    /**
+     * 复制文件
+     * @param src
+     * @param target
+     */
+    public static void copyFile(String src,String target)
+    {
+        File srcFile = new File(src);
+        File targetFile = new File(target);
+        try {
+            InputStream in = new FileInputStream(srcFile);
+            OutputStream out = new FileOutputStream(targetFile);
+            byte[] bytes = new byte[1024];
+            int len = -1;
+            while((len=in.read(bytes))!=-1)
+            {
+                out.write(bytes, 0, len);
+            }
+            in.close();
+            out.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("文件复制成功");
+    }
+
+    /**
+     * 给新的文件名，创建父级目录
+     */
+    public static void mkParentDir(File newFile) {
+        //拼接新的目录
+        String programDir = newFile.getParent();
+        if (!new File(programDir).isDirectory()) {
+            //创建文件夹
+            new File(newFile.getParent()).mkdirs();
+            System.out.println("创建新文件夹：" + new File(programDir).getName());
+        }
+    }
+
 }

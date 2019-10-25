@@ -93,8 +93,14 @@ public interface FrameDao {
     int updateImageById(String id,String images);
 
     /**
-     * 更新gif和video数据
+     * 更新gif数据
      */
-    @Update("update program_shop set gif = #{gifPath} , video = #{videoPath} where id = #{id}")
-    int updateVideoAndGifById(int id,String videoPath,String gifPath);
+    @Update("update program_shop set gif = #{gifPath} where id = #{id}")
+    int updateGifById(int id,String gifPath);
+
+    /**
+     * 更新video数据
+     */
+    @Update("update program_shop set video = #{videoPath} where id = #{id}")
+    int updateVideoById(int id,String videoPath);
 }

@@ -8,6 +8,7 @@ import com.scohong.entity.video.Video;
 import com.scohong.utils.CommonUtils;
 import com.scohong.utils.ResponseUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -78,21 +79,45 @@ public class VideoController {
         if (!gifDir.isDirectory()) {
             gifDir.mkdirs();
         }
-        String videoName = UUID.randomUUID().toString().substring(0,8);
+
+        String program = video.getProgram()[0];
+        String file = video.getProgram()[1];
+        String filePath = ConfigManagment.RECORDLOCALDIR + program+File.separator+file;
+        //根据
+        String videoName = DigestUtils.md5Hex(video.getVideoStartTime()+ program+file).substring(0,8);
         String videoFile = videoOutPath + videoName + ".mp4";
-        String gifName = UUID.randomUUID().toString().substring(0,8);
+        String gifName = DigestUtils.md5Hex(video.getGifStartTime()+ program + file).substring(0,8);
         String gifFile = gifOutPath + gifName + ".gif";
         //转换时间
         int videoStartTime = CommonUtils.getSecond(video.getVideoStartTime());
         int videoEndTime = CommonUtils.getSecond(video.getVideoEndTime());
-        int gifStartTime = CommonUtils.getSecond(video.getGifStartTime());
-        int gifEndTime = CommonUtils.getSecond(video.getGifEndTime());
-        if (videoEndTime <= videoStartTime || gifEndTime <= gifStartTime) {
-            return ResponseUtil.error().setMsg("结束时间大于起始时间，请重新选择！");
+        if (video.getGifStartTime() != null && video.getGifEndTime() != null) {
+            int gifStartTime = CommonUtils.getSecond(video.getGifStartTime());
+            int gifEndTime = CommonUtils.getSecond(video.getGifEndTime());
+            if (gifEndTime <= gifStartTime) {
+                return ResponseUtil.error().setMsg("结束时间大于起始时间，请重新选择！");
+            }
+            /** 剪gif*/
+            String[] cutGif = new String[] { "D:\\Anaconda\\python.exe", "F:/workspace/python/cutGif.py",
+                    filePath,String.valueOf(gifStartTime), String.valueOf(gifEndTime - gifStartTime), gifFile};
+            Process procGif = null;
+            try {
+                procGif = Runtime.getRuntime().exec(cutGif);
+                procGif.waitFor();
+                String gifSqlPath = ConfigManagment.GIFSQLDIR + video.getProgram()[0] + "/" + gifName + ".gif";
+                int i = frameDao.updateGifById(video.getFrameId(), gifSqlPath);
+                if (i == 1) {
+                    return ResponseUtil.ok();
+                } else {
+                    return ResponseUtil.error().setMsg("数据更新失败，请联系小洪");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
-        String program = video.getProgram()[0];
-        String file = video.getProgram()[1];
-        String filePath = ConfigManagment.RECORDLOCALDIR + program+File.separator+file;
+
 //        // TODO Auto-generated method stub
         try {
             /**py脚本
@@ -104,21 +129,17 @@ public class VideoController {
             Process proc = Runtime.getRuntime().exec(cutVideo);
             proc.waitFor();
             //用输入输出流来截取结果
-            /** 剪gif*/
-            String[] cutGif = new String[] { "D:\\Anaconda\\python.exe", "F:/workspace/python/cutGif.py",
-                    filePath,String.valueOf(gifStartTime), String.valueOf(gifEndTime - gifStartTime), gifFile};
-            Process procGif = Runtime.getRuntime().exec(cutGif);
-            procGif.waitFor();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        log.info(videoFile);
+        log.info(gifFile);
 
-            /**更新sql的gif和video数据*/
+        /**更新sql的gif和video数据*/
         String videoSqlPath = ConfigManagment.VIDEOSQLDIR + video.getProgram()[0] +"/"+ videoName + ".mp4";
-        String gifSqlPath = ConfigManagment.GIFSQLDIR + video.getProgram()[0] + "/" + gifName + ".gif";
-        int i = frameDao.updateVideoAndGifById(video.getFrameId(), videoSqlPath, gifSqlPath);
+        int i = frameDao.updateVideoById(video.getFrameId(), videoSqlPath);
         if (i == 1) {
             return ResponseUtil.ok();
         } else {

@@ -23,4 +23,9 @@ public class ConfigManagment {
     /**纪录片剪辑后的gif本地存储目录*/
     public static final String GIFCUTDIR = "E:\\剧能吃\\gif\\";
     public static final String GIFSQLDIR = "/gif/";
+    /**
+     * 数据迁移
+     */
+    public static final String PROGRAMEPICDIR = "F://数据分部/上线/images/";
+    public static final String FRAMEPICDIR = "F://数据分部/上线/images/";
 }

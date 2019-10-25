@@ -1,6 +1,7 @@
 package com.scohong.dao;
 
 import com.scohong.entity.junengchi.Shop;
+import com.scohong.entity.map.ShopMap;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -36,4 +37,14 @@ public interface ShopDao {
 
     @Update("update shop set cover_pic = #{coverPic} where `name` = #{shopName} ")
     Integer updateShopCoverPic(String shopName,String coverPic);
+
+    /**
+     * 地图更新
+     * @return
+     */
+    @Select("select id,address from shop")
+    List<ShopMap> getAllShopByMap();
+
+    @Update("UPDATE shop set longitude = #{longitude},latitude = #{latitude} ,`level` = #{level}  where id = #{id} ")
+    int updateAddress(ShopMap frame);
 }
