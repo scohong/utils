@@ -106,9 +106,7 @@ public class VideoController {
                 procGif.waitFor();
                 String gifSqlPath = ConfigManagment.GIFSQLDIR + video.getProgram()[0] + "/" + gifName + ".gif";
                 int i = frameDao.updateGifById(video.getFrameId(), gifSqlPath);
-                if (i == 1) {
-                    return ResponseUtil.ok();
-                } else {
+                if (i != 1) {
                     return ResponseUtil.error().setMsg("数据更新失败，请联系小洪");
                 }
             } catch (IOException e) {
@@ -119,32 +117,38 @@ public class VideoController {
         }
 
 //        // TODO Auto-generated method stub
-        try {
-            /**py脚本
-             * 'ffmpeg -i "{video_path}" -ss {start_time} -c copy -to {end_time} -codec:a aac "{out_path}"'
-             * */
-            /** 剪视频*/
-            String[] cutVideo = new String[] { "D:\\Anaconda\\python.exe", "F:/workspace/python/cutVideo.py",
-                    filePath, String.valueOf(videoStartTime), String.valueOf(videoEndTime - videoStartTime), videoFile};
-            Process proc = Runtime.getRuntime().exec(cutVideo);
-            proc.waitFor();
-            //用输入输出流来截取结果
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        log.info(videoFile);
-        log.info(gifFile);
+        if (video.getVideoStartTime() != null && video.getVideoEndTime() != null) {
+            if (videoStartTime > videoEndTime) {
+                return ResponseUtil.error().setMsg("结束时间大于起始时间，请重新选择！");
+            }
+            try {
+                /**py脚本
+                 * 'ffmpeg -i "{video_path}" -ss {start_time} -c copy -to {end_time} -codec:a aac "{out_path}"'
+                 * */
+                /** 剪视频*/
+                String[] cutVideo = new String[] { "D:\\Anaconda\\python.exe", "F:/workspace/python/cutVideo.py",
+                        filePath, String.valueOf(videoStartTime), String.valueOf(videoEndTime - videoStartTime), videoFile};
+                Process proc = Runtime.getRuntime().exec(cutVideo);
+                proc.waitFor();
+                //用输入输出流来截取结果
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            log.info(videoFile);
+            log.info(gifFile);
 
-        /**更新sql的gif和video数据*/
-        String videoSqlPath = ConfigManagment.VIDEOSQLDIR + video.getProgram()[0] +"/"+ videoName + ".mp4";
-        int i = frameDao.updateVideoById(video.getFrameId(), videoSqlPath);
-        if (i == 1) {
-            return ResponseUtil.ok();
-        } else {
-            return ResponseUtil.error().setMsg("数据更新失败，请联系小洪");
+            /**更新sql的gif和video数据*/
+            String videoSqlPath = ConfigManagment.VIDEOSQLDIR + video.getProgram()[0] +"/"+ videoName + ".mp4";
+            int i = frameDao.updateVideoById(video.getFrameId(), videoSqlPath);
+            if (i == 1) {
+                return ResponseUtil.ok().setMsg("剪辑成功");
+            } else {
+                return ResponseUtil.error().setMsg("数据更新失败，请联系小洪");
+            }
         }
+        return ResponseUtil.ok();
     }
 
 }

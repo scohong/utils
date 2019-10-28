@@ -30,7 +30,6 @@ public class PianchangController {
     @Autowired
     PianchangDao pianchangDao;
 
-
     @GetMapping("/data")
     public String getData() throws Exception {
         //新版09-09
