@@ -13,10 +13,9 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import org.springframework.web.client.RestTemplate;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -105,7 +104,7 @@ public class VideoController {
                 procGif = Runtime.getRuntime().exec(cutGif);
                 procGif.waitFor();
                 String gifSqlPath = ConfigManagment.GIFSQLDIR + video.getProgram()[0] + "/" + gifName + ".gif";
-                int i = frameDao.updateGifById(video.getFrameId(), gifSqlPath);
+                int i = frameDao.updateGifById(video.getFrameId(), gifSqlPath,gifStartTime,gifEndTime);
                 if (i != 1) {
                     return ResponseUtil.error().setMsg("数据更新失败，请联系小洪");
                 }
@@ -116,7 +115,7 @@ public class VideoController {
             }
         }
 
-//        // TODO Auto-generated method stub
+        // TODO Auto-generated method stub
         if (video.getVideoStartTime() != null && video.getVideoEndTime() != null) {
             if (videoStartTime > videoEndTime) {
                 return ResponseUtil.error().setMsg("结束时间大于起始时间，请重新选择！");
@@ -141,7 +140,7 @@ public class VideoController {
 
             /**更新sql的gif和video数据*/
             String videoSqlPath = ConfigManagment.VIDEOSQLDIR + video.getProgram()[0] +"/"+ videoName + ".mp4";
-            int i = frameDao.updateVideoById(video.getFrameId(), videoSqlPath);
+            int i = frameDao.updateVideoById(video.getFrameId(), videoSqlPath,videoStartTime,videoEndTime);
             if (i == 1) {
                 return ResponseUtil.ok().setMsg("剪辑成功");
             } else {
@@ -149,6 +148,112 @@ public class VideoController {
             }
         }
         return ResponseUtil.ok();
+    }
+
+    /**
+     *  填坑，根据日志文件剪辑
+     * @return
+     */
+    @Test
+    @GetMapping("/test")
+    public void cutVideoByFile() {
+        File fileT = new File("C:\\Users\\scohong\\Desktop\\剧能吃\\测试\\没有视频.txt");
+        BufferedReader reader = null;
+        //用于解析json
+        RestTemplate restTemplate = new RestTemplate();
+        String program = "";
+        String episode = "";
+        try {
+            reader = new BufferedReader(new FileReader(fileT));
+            String tempString = null;
+
+            int line = 1;
+            // 一次读入一行，直到读入null为文件结束
+            while ((tempString = reader.readLine()) != null) {
+                // 显示行号
+//                System.out.println(tempString.substring(36));
+                String videoJson = tempString.substring(36);
+                String [] strs = videoJson.split(",");
+                String  frameId = strs[0].substring(14);
+                program = strs[1].substring(10);
+                episode = strs[2].substring(1,strs[2].length() - 1);
+                String  vStart = strs[3].substring(16,strs[3].length() - 1);
+                String  vEnd = strs[4].substring(14,strs[4].length() - 1);
+                Video video = new Video();
+                video.setFrameId(Integer.parseInt(frameId));
+                System.out.println(frameId);
+                video.setVideoStartTime(vStart);
+                video.setVideoEndTime(vEnd);
+                line++;
+
+                String localVideoDir = ConfigManagment.VIDEOCUTDIR;
+                String localGifDir = ConfigManagment.GIFCUTDIR;
+                String videoOutPath = localVideoDir+program+File.separator;
+                String gifOutPath = localGifDir+episode+File.separator;
+                //没有目录就创建
+                File videoDir = new File(videoOutPath);
+                File gifDir = new File(gifOutPath);
+                if (!videoDir.isDirectory()) {
+                    //多级路径没有，用mkdirs，只有一级路径用mkdir
+                    videoDir.mkdirs();
+                }
+                if (!gifDir.isDirectory()) {
+                    gifDir.mkdirs();
+                }
+                String file = episode;
+                String filePath = ConfigManagment.RECORDLOCALDIR + program+File.separator+file;
+                //根据
+                String videoName = DigestUtils.md5Hex(video.getVideoStartTime()+ program+file).substring(0,8);
+                String videoFile = videoOutPath + videoName + ".mp4";
+                String gifName = DigestUtils.md5Hex(video.getGifStartTime()+ program + file).substring(0,8);
+                String gifFile = gifOutPath + gifName + ".gif";
+                //转换时间
+                int videoStartTime = CommonUtils.getSecond(video.getVideoStartTime());
+                int videoEndTime = CommonUtils.getSecond(video.getVideoEndTime());
+                // TODO Auto-generated method stub
+                if (video.getVideoStartTime() != null && video.getVideoEndTime() != null) {
+                    if (videoStartTime > videoEndTime) {
+                        System.out.println("结束时间大于起始时间，请重新选择！");
+                    }
+                    try {
+                        /**py脚本
+                         * 'ffmpeg -i "{video_path}" -ss {start_time} -c copy -to {end_time} -codec:a aac "{out_path}"'
+                         * */
+                        /** 剪视频*/
+                        String[] cutVideo = new String[] { "D:\\Anaconda\\python.exe", "F:/workspace/python/cutVideo.py",
+                                filePath, String.valueOf(videoStartTime), String.valueOf(videoEndTime - videoStartTime), videoFile};
+                        Process proc = Runtime.getRuntime().exec(cutVideo);
+                        proc.waitFor();
+                        //用输入输出流来截取结果
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    log.info(videoFile);
+                    log.info(gifFile);
+
+                    /**更新sql的gif和video数据*/
+                    String videoSqlPath = ConfigManagment.VIDEOSQLDIR + program +"/"+ videoName + ".mp4";
+                    int i = frameDao.updateVideoById(video.getFrameId(), videoSqlPath,0,0);
+                    if (i == 1) {
+                        System.out.println("剪辑成功");
+                    } else {
+                        System.out.println("数据更新失败，请联系小洪");
+                    }
+                }
+            }
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e1) {
+                }
+            }
+        }
     }
 
 }

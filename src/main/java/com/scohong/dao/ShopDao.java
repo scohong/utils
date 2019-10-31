@@ -38,6 +38,9 @@ public interface ShopDao {
     @Update("update shop set cover_pic = #{coverPic} where `name` = #{shopName} ")
     Integer updateShopCoverPic(String shopName,String coverPic);
 
+    @Update("update shop set cover_pic_md5 = #{coverPic} where `name` = #{shopName} ")
+    Integer updateShopCoverPicMd5(String shopName,String coverPic);
+
     /**
      * 地图更新
      * @return

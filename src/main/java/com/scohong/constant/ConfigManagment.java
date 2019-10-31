@@ -11,10 +11,13 @@ public class ConfigManagment {
 
     /**数据管理，手动上传路径 */
     public static final String realImagesPath = "E://剧能吃//data/";
+    public static final String VIDEOLOCALPATH = "E://剧能吃//video/";
     public static final String realShopPath = "E://剧能吃//data/shops/";
     public static final String relativeBackendPath = "E://test/";
     public static final String backendUpload = "/images/";
     public static final String relativeShopPath = "/images/shops/";
+    public static final String ONLYREALIMAGEPATH = "F://数据分部/原图/images-program/";
+    public static final String ONLYTHUMBIMAGEPATH = "F://数据分部/原图/shops/";
 
     /**纪录片的本地目录*/
     public static final String RECORDLOCALDIR = "D:\\剧能吃-纪录片\\";
@@ -27,6 +30,7 @@ public class ConfigManagment {
     /**
      * 数据迁移
      */
-    public static final String PROGRAMEPICDIR = "F://数据分部/上线/images/";
+    public static final String PROGRAMEPICDIR = "F://数据分部/原图/images/";
+    public static final String VIDEODIR = "F://数据分部/原图/video/";
     public static final String FRAMEPICDIR = "F://数据分部/上线/images/";
 }

@@ -20,11 +20,14 @@ public interface ProgramDao {
     List<Program>  getAllProgram();
 
     @Delete("DELETE from program where id = #{programId}")
-    int  delProgram(int programId);
+    int delProgram(int programId);
 
-    @Update("UPDATE  program set `name` = #{programName},alias = #{programAlias} ," +
+    @Update("UPDATE program set `name` = #{programName},alias = #{programAlias} ," +
             " types = #{types} ,introduction=#{introduction} ,actor = #{actor} where id = #{programId}")
     int  updateProgram(Program program);
+
+    @Update("UPDATE program set cover_pic_md5 = #{picMd5},vertical_cover_pic_md5 = #{vPicMd5} where id = #{id}")
+    int  updateProgramPicMd5(int id, String picMd5, String vPicMd5);
 
     @Select("SELECT  distinct `name` from program ")
     List<String>  getProgramName();

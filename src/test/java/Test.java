@@ -21,7 +21,7 @@ public class Test {
      * @param args
      * @throws Exception
      */
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args){
 //        thumbFile(new File("D:\\剧能吃-压缩图片\\"));
 //        String dir = "D:\\剧能吃-压缩图片\\";
 //            int num = diguiFile(new File(dir),0);
@@ -39,21 +39,46 @@ public class Test {
 //        }
 
         //压缩文件
-//        File file = new File("E:\\剧能吃\\新建文件夹 (2)\\");
-//        for (File f:file.listFiles()
-//             ) {
-//            String newFileName = f.getName().replaceAll(".png", "");
-//            Thumbnails
-//                    .of(f)
-//                    .scale(1)
-//                    .outputFormat("jpg")
-//                    .outputQuality(0.8)
-//                    .toFile(f.getParent().concat(File.separator).concat("/t_").concat(newFileName));
-//        }
+        File file = new File("F:\\数据分部\\原图\\programs-0.8-0.8\\");
+        int small = 0;
+        int middle = 0;
+        int big = 0;
+        for (File f:file.listFiles()
+             ) {
+            if (!f.isDirectory()) {
+                continue;
+            }
+            for (File ff : f.listFiles()) {
+                long size = ff.length() / 1024;
+                if (size < 100) {
+                    small++;
+                } else if (size < 200) {
+                    middle++;
+                } else {
+                    big++;
+                }
+//                String newFileName = ff.getAbsolutePath().replaceAll("programs", "programs-0.8-0.8");
+//                String dir = new File(newFileName).getParent();
+//                if (!new File(dir).isDirectory()) {
+//                    new File(dir).mkdirs();
+//                }
+//                System.out.println(newFileName);
+//                try {
+//                    Thumbnails
+//                            .of(ff)
+//                            .scale(1)
+//                            .outputQuality(0.8)
+//                            .toFile(newFileName);
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+            }
 
-        String s = "E:\\剧能吃\\data\\shops\\Bar Rouge\\C2.jpg";
-        File file = new File(s);
-        System.out.println(file.isFile());
+        }
+        System.out.println(small);
+        System.out.println(middle);
+        System.out.println(big);
+
 
     }
 

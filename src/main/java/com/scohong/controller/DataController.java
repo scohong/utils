@@ -89,7 +89,13 @@ public class DataController {
         String newProgramDir = ConfigManagment.PROGRAMEPICDIR;
         for (FrameData f : frameDataList
         ) {
-            String thumbImages = f.getThumbImages();
+            //迁移缩略图
+//            String thumbImages = f.getThumbImages();
+            //迁移原图
+            String thumbImages = f.getImages();
+            if (thumbImages == null || thumbImages.isEmpty()) {
+                continue;
+            }
             String [] imageStr = thumbImages.split(";");
             for (String image:imageStr
                  ) {
@@ -102,12 +108,48 @@ public class DataController {
                     File newFile = new File(newProgramDir + image);
                     //创建父级目录
                     FileUtil.mkParentDir(newFile);
+                    if (!newFile.isFile()) {
+                        FileUtil.copyFile(picFile.getAbsolutePath(), newFile.getAbsolutePath());
+                    }
                     //复制文件
-//                    FileUtil.copyFile(picFile.getAbsolutePath(), newFile.getAbsolutePath());
                 } else {
                     log.info("文件不存在：" + image);
                 }
             }
+        }
+        return ResponseUtil.ok();
+    }
+
+    @GetMapping("/video")
+    public Response removeVideo() {
+        List<FrameData> frameDataList = frameDao.getAllFrameData();
+        String newVideoDir = ConfigManagment.VIDEODIR;
+        for (FrameData f : frameDataList
+        ) {
+            //迁移缩略图
+//            String thumbImages = f.getThumbImages();
+            //迁移原图
+            String video = f.getVideo();
+            if (video == null || video.isEmpty()) {
+                continue;
+            }
+            video = video.replaceAll("/video", "");
+            //原始图片地址，picFile
+            File videoFile = new File(ConfigManagment.VIDEOLOCALPATH + video);
+            //图片存在，则复制迁移，待删除
+            if (videoFile.isFile()) {
+                //拼接新的目录
+                File newFile = new File(newVideoDir + videoFile);
+                //创建父级目录
+                FileUtil.mkParentDir(newFile);
+                if (!newFile.isFile()) {
+                    FileUtil.copyFile(videoFile.getAbsolutePath(), newFile.getAbsolutePath());
+                }
+                    //复制文件
+                } else {
+                    log.info("文件不存在：" + video);
+                }
+
         }
         return ResponseUtil.ok();
     }
