@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
@@ -36,9 +37,9 @@ public class MapController {
      * @return
      */
     @GetMapping("/updateShopLocByBaidu")
-    public String getMap() {
+    public String getMap(@RequestParam int id) {
         RestTemplate restTemplate = new RestTemplate();
-        List<ShopMap> frames = shopDao.getAllShopByMap();
+        List<ShopMap> frames = shopDao.getAllShopByMap(0);
         int i = 0;
         for (ShopMap frame : frames
         ) {
@@ -83,9 +84,9 @@ public class MapController {
      * @return
      */
     @GetMapping("/updateShopLocByGaode")
-    public String getGaodeMap() {
+    public String getGaodeMap(@RequestParam int id) {
         RestTemplate restTemplate = new RestTemplate();
-        List<ShopMap> frames = shopDao.getAllShopByMap();
+        List<ShopMap> frames = shopDao.getAllShopByMap(id);
         int count = 0;
         for (ShopMap frame : frames
         ) {

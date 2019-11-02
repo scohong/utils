@@ -45,8 +45,8 @@ public interface ShopDao {
      * 地图更新
      * @return
      */
-    @Select("select id,address from shop")
-    List<ShopMap> getAllShopByMap();
+    @Select("select id,address from shop where id >= #{id}")
+    List<ShopMap> getAllShopByMap(int id);
 
     @Update("UPDATE shop set longitude = #{longitude},latitude = #{latitude} ,`level` = #{level}  where id = #{id} ")
     int updateAddress(ShopMap frame);

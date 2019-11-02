@@ -197,7 +197,7 @@ public class FrameController {
                         .toFile(savePath
                                 .concat(File.separator)
                                 .concat("t_")
-                                .concat(image1[0].getOriginalFilename()));
+                                .concat(image1[0].getOriginalFilename().replaceAll("[.][^.]+$", "")));
                 imagesPathList.add(saveLocalPath.concat(image1[0].getOriginalFilename()));
                 String thumbPicPath = saveLocalPath.concat("t_").concat(image1[0].getOriginalFilename());
                 log.info(thumbPicPath);
@@ -209,13 +209,34 @@ public class FrameController {
 
             }
             if (image2.length > 0) {
-                FileUtil.saveFile(image2[0], savePath);
+                String tPath2 = FileUtil.saveFile(image2[0], savePath);
+                //获取转换后的真实路径
+                tPath2 = ImageUtil.pngTojpgFile(new File(tPath2));
+                //生成缩略图
+                Thumbnails.of(new File(tPath2))
+                        .scale(1)
+                        .outputFormat("jpg")
+                        .toFile(savePath
+                                .concat(File.separator)
+                                .concat("t_")
+                                .concat(image1[0].getOriginalFilename().replaceAll("[.][^.]+$", "")));
                 imagesPathList.add(saveLocalPath.concat(image2[0].getOriginalFilename()));
-                thumbImagesPathList.add(saveLocalPath.concat("t_").concat(image2[0].getOriginalFilename()));
+                thumbImagesPathList.add(saveLocalPath.concat("t_").concat(image2[0].getOriginalFilename().replaceAll("png","jpg")));
             }
             if (image3.length > 0) {
-                FileUtil.saveFile(image3[0], savePath);
-                imagesPathList.add(saveLocalPath.concat(image3[0].getOriginalFilename()));
+                String tPath3 = FileUtil.saveFile(image3[0], savePath);
+                //获取转换后的真实路径
+                tPath3 = ImageUtil.pngTojpgFile(new File(tPath3));
+                //生成缩略图
+                Thumbnails.of(new File(tPath3))
+                        .scale(1)
+                        .outputFormat("jpg")
+                        .toFile(savePath
+                                .concat(File.separator)
+                                .concat("t_")
+                                .concat(image3[0].getOriginalFilename().replaceAll("[.][^.]+$", "")));
+
+                imagesPathList.add(saveLocalPath.concat(image3[0].getOriginalFilename().replaceAll("png","jpg")));
                 thumbImagesPathList.add(saveLocalPath.concat("t_").concat(image3[0].getOriginalFilename()));
             }
         } catch (IOException e) {

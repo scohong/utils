@@ -39,6 +39,10 @@ public class DataController {
     @Autowired
     FrameDao frameDao;
 
+    /**
+     * 节目封面图
+     * @return
+     */
     @GetMapping("/programPic")
     public Response removeProgramPic() {
         List<Program> programList = programDao.getAllProgram();
@@ -83,14 +87,17 @@ public class DataController {
         return ResponseUtil.ok();
     }
 
+    /**
+     * 取景图
+     * @return
+     */
     @GetMapping("/frame")
     public Response removeFramePic() {
         List<FrameData> frameDataList = frameDao.getAllFrameData();
         String newProgramDir = ConfigManagment.PROGRAMEPICDIR;
+        int newCount = 0;
         for (FrameData f : frameDataList
         ) {
-            //迁移缩略图
-//            String thumbImages = f.getThumbImages();
             //迁移原图
             String thumbImages = f.getImages();
             if (thumbImages == null || thumbImages.isEmpty()) {
@@ -109,6 +116,8 @@ public class DataController {
                     //创建父级目录
                     FileUtil.mkParentDir(newFile);
                     if (!newFile.isFile()) {
+                        log.info(newFile.getName());
+                        newCount++;
                         FileUtil.copyFile(picFile.getAbsolutePath(), newFile.getAbsolutePath());
                     }
                     //复制文件
@@ -117,18 +126,21 @@ public class DataController {
                 }
             }
         }
+        System.out.println(newCount);
         return ResponseUtil.ok();
     }
 
+    /**
+     * 视频
+     * @return
+     */
     @GetMapping("/video")
     public Response removeVideo() {
         List<FrameData> frameDataList = frameDao.getAllFrameData();
         String newVideoDir = ConfigManagment.VIDEODIR;
+        int newCount = 0;
         for (FrameData f : frameDataList
         ) {
-            //迁移缩略图
-//            String thumbImages = f.getThumbImages();
-            //迁移原图
             String video = f.getVideo();
             if (video == null || video.isEmpty()) {
                 continue;
@@ -139,10 +151,12 @@ public class DataController {
             //图片存在，则复制迁移，待删除
             if (videoFile.isFile()) {
                 //拼接新的目录
-                File newFile = new File(newVideoDir + videoFile);
+                File newFile = new File(newVideoDir + video);
                 //创建父级目录
                 FileUtil.mkParentDir(newFile);
                 if (!newFile.isFile()) {
+                    newCount++;
+                    log.info(videoFile.getAbsolutePath());
                     FileUtil.copyFile(videoFile.getAbsolutePath(), newFile.getAbsolutePath());
                 }
                     //复制文件
@@ -151,6 +165,7 @@ public class DataController {
                 }
 
         }
+        System.out.println(newCount);
         return ResponseUtil.ok();
     }
 }
