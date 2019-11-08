@@ -78,14 +78,13 @@ public class VideoController {
         if (!gifDir.isDirectory()) {
             gifDir.mkdirs();
         }
-
         String program = video.getProgram()[0];
         String file = video.getProgram()[1];
         String filePath = ConfigManagment.RECORDLOCALDIR + program+File.separator+file;
-        //根据
-        String videoName = DigestUtils.md5Hex(video.getVideoStartTime()+ program+file).substring(0,8);
+        //根据时间生成文件名，避免测试剪辑视频时覆盖。
+        String videoName = DigestUtils.md5Hex(CommonUtils.getCurrentTime()+ program+file).substring(0,8);
         String videoFile = videoOutPath + videoName + ".mp4";
-        String gifName = DigestUtils.md5Hex(video.getGifStartTime()+ program + file).substring(0,8);
+        String gifName = DigestUtils.md5Hex(CommonUtils.getCurrentTime()+ program + file).substring(0,8);
         String gifFile = gifOutPath + gifName + ".gif";
         //转换时间
         int videoStartTime = CommonUtils.getSecond(video.getVideoStartTime());

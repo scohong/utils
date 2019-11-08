@@ -1,5 +1,6 @@
 import com.google.common.hash.Hashing;
 import com.scohong.constant.ConfigManagment;
+import com.scohong.utils.FileUtil;
 import com.scohong.utils.ImageUtil;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
@@ -21,66 +22,41 @@ public class Test {
      * @param args
      * @throws Exception
      */
-    public static void main(String[] args){
-//        thumbFile(new File("D:\\剧能吃-压缩图片\\"));
-//        String dir = "D:\\剧能吃-压缩图片\\";
-//            int num = diguiFile(new File(dir),0);
-//        System.out.println("del:" + num);
-//        String outDir = ConfigManagment.VIDEOCUTDIR;
-//        String videoOutPath = outDir+"abc"+"\\video\\";
-//        log.info(videoOutPath);
-//        String gifOutPath = outDir+"abc"+"/gif/";
-//        //没有目录就创建
-//        File videoDir = new File(videoOutPath);
-//        File gifDir = new File(gifOutPath);
-//        if (!videoDir.isDirectory()) {
-//            log.info("video创建目录");
-//            videoDir.mkdirs();
-//        }
-
-        //压缩文件
-        File file = new File("F:\\数据分部\\原图\\programs-0.8-0.8\\");
-        int small = 0;
-        int middle = 0;
-        int big = 0;
-        for (File f:file.listFiles()
-             ) {
-            if (!f.isDirectory()) {
-                continue;
-            }
-            for (File ff : f.listFiles()) {
-                long size = ff.length() / 1024;
-                if (size < 100) {
-                    small++;
-                } else if (size < 200) {
-                    middle++;
-                } else {
-                    big++;
-                }
-//                String newFileName = ff.getAbsolutePath().replaceAll("programs", "programs-0.8-0.8");
-//                String dir = new File(newFileName).getParent();
-//                if (!new File(dir).isDirectory()) {
-//                    new File(dir).mkdirs();
-//                }
-//                System.out.println(newFileName);
-//                try {
-//                    Thumbnails
-//                            .of(ff)
-//                            .scale(1)
-//                            .outputQuality(0.8)
-//                            .toFile(newFileName);
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-            }
-
-        }
-        System.out.println(small);
-        System.out.println(middle);
-        System.out.println(big);
-
+    public static void main(String[] args) {
+//        FileUtil.checkImageDimenSize("F:\\数据分部\\压缩\\压缩结果-540p\\石梅湾艾美度假酒店\\酒店5.jpg");
+        thumbImage();
 
     }
+    public static void thumbImage() {
+        //        FileUtil.checkImageFileSize("F:\\数据分部\\原图\\shop-1104\\shops\\");
+        File[] file = new File("F:\\数据分部\\压缩\\待压缩\\").listFiles();
+        for (File f : file) {
+            for (File ff : f.listFiles()) {
+                if (ff.getAbsolutePath().indexOf("jpg") != -1) {
+                    FileUtil.checkImageDimenSize(ff.getAbsolutePath());
+                }
+                String newFileName = ff.getAbsolutePath().replaceAll("待压缩", "压缩结果-540p");
+                FileUtil.mkParentDir(new File(newFileName));
+                System.out.println(newFileName);
+                try {
+                    for (int i = 1; i <= 10; i++) {
+                        String newName = newFileName.replaceAll(".png", String.valueOf(i));
+                        newName = newName.replaceAll(".jpg", i + ".jpg");
+                        System.out.println(newName);
+                        Thumbnails
+                                .of(ff)
+                                .scale(i*0.1)
+                                .outputQuality(0.8)
+                                .outputFormat("jpg")
+                                .toFile(newName);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
 
     public static void thumbFile(File file) {
         if (file.isDirectory()) {
@@ -126,7 +102,6 @@ public class Test {
 //            count++;
 //        }
                         //获取文件大小(kb)
-
         return count;
     }
 }

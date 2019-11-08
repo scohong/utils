@@ -129,4 +129,60 @@ public class MapController {
         System.out.println("插入失败sum：" + count);
         return "ok";
     }
+
+    /**
+     * 高德api修复百度经纬度
+     * 6000qps/d
+     *
+     * @return
+     */
+    @GetMapping("/debugShopLocByGaode")
+    public String updateGaodeMap(@RequestParam int id) {
+        RestTemplate restTemplate = new RestTemplate();
+        List<ShopMap> frames = shopDao.getAllShopByMap(id);
+        int count = 0;
+        for (ShopMap frame : frames
+        ) {
+            String url = "https://restapi.amap.com/v3/geocode/geo?key=c227549a740e0f19f9a2213f86538dba&" +
+                    "address=";
+            if (frame.getLatitude() != null  && !frame.getLatitude().isEmpty() && frame.getLatitude().length() > 10) {
+                System.out.println(frame.getLatitude());
+                String city = frame.getCity();
+                String address = city + frame.getAddress();
+                String fullUrl = url + address;
+                String response = restTemplate.getForObject(fullUrl, String.class);
+                System.out.println(response);
+                try {
+                    GaodeMapResult gdList = JSONObject.parseObject(response, GaodeMapResult.class);
+                    if (gdList.getCount() != 1) {
+                        log.info("查询失败"+frame.getId()+":"+frame.getAddress());
+                        continue;
+                    }
+                    Geocodes gd = gdList.getGeocodes().get(0);
+                    String[] loc = gd.getLocation().split(",");
+                    String lat = loc[1];
+                    String lng = loc[0];
+                    frame.setLongitude(lng);
+                    frame.setLatitude(lat);
+                    int i = shopDao.updateAddress(frame);
+                    if (i != 1) {
+                        count++;
+                        log.info("插入失败");
+                    }
+                    System.out.println(frame.getId() + ":" + frame.getAddress());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    continue;
+                }
+                try {
+                    Thread.sleep(20);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
+        System.out.println("插入失败sum：" + count);
+        return "ok";
+    }
 }

@@ -7,6 +7,7 @@ import com.scohong.dao.ShopDao;
 import com.scohong.entity.common.Response;
 import com.scohong.entity.junengchi.FrameData;
 import com.scohong.entity.junengchi.Program;
+import com.scohong.entity.junengchi.Shop;
 import com.scohong.utils.FileUtil;
 import com.scohong.utils.ResponseUtil;
 import io.swagger.annotations.Api;
@@ -41,6 +42,7 @@ public class DataController {
 
     /**
      * 节目封面图
+     *
      * @return
      */
     @GetMapping("/programPic")
@@ -88,7 +90,45 @@ public class DataController {
     }
 
     /**
-     * 取景图
+     * 商家门面图
+     *
+     * @return
+     */
+    @GetMapping("/shopPic")
+    public Response removeShopPic() {
+        List<Shop> shopList = shopDao.getAllShops();
+        String newShopDir = ConfigManagment.SHOP_PIC_DIR;
+        File dir = new File(newShopDir);
+        //创建目录
+        if (!dir.isDirectory()) {
+            dir.mkdirs();
+        }
+        for (Shop p : shopList
+        ) {
+            String coverPic = p.getCoverPic();
+            if (coverPic != null && coverPic.length() > 0) {
+                coverPic = coverPic.replaceAll("/images", "");
+                //原始图片地址，picFile
+                File picFile = new File(ConfigManagment.realImagesPath + coverPic);
+                //图片存在，则复制迁移，待删除
+                if (picFile.isFile()) {
+                    //拼接新的目录
+                    File newFile = new File(newShopDir + coverPic);
+                    //创建父级目录
+                    FileUtil.mkParentDir(newFile);
+                    //复制文件
+                    FileUtil.copyFile(picFile.getAbsolutePath(), newFile.getAbsolutePath());
+                } else {
+                    log.info("文件不存在：" + picFile.getName());
+                }
+            }
+        }
+        return ResponseUtil.ok();
+    }
+
+    /**
+     * 取景图-原图
+     *
      * @return
      */
     @GetMapping("/frame")
@@ -103,9 +143,53 @@ public class DataController {
             if (thumbImages == null || thumbImages.isEmpty()) {
                 continue;
             }
-            String [] imageStr = thumbImages.split(";");
-            for (String image:imageStr
-                 ) {
+            String[] imageStr = thumbImages.split(";");
+            for (String image : imageStr
+            ) {
+                image = image.replaceAll("/images", "");
+                //原始图片地址，picFile
+                File picFile = new File(ConfigManagment.realImagesPath + image);
+                //图片存在，则复制迁移，待删除
+                if (picFile.isFile()) {
+                    //拼接新的目录
+                    File newFile = new File(newProgramDir + image);
+                    //创建父级目录
+                    FileUtil.mkParentDir(newFile);
+                    if (!newFile.isFile()) {
+                        log.info(newFile.getName());
+                        newCount++;
+                        FileUtil.copyFile(picFile.getAbsolutePath(), newFile.getAbsolutePath());
+                    }
+                    //复制文件
+                } else {
+                    log.info("文件不存在：" + image);
+                }
+            }
+        }
+        System.out.println(newCount);
+        return ResponseUtil.ok();
+    }
+
+    /**
+     * 取景图-原图
+     *
+     * @return
+     */
+    @GetMapping("/thumbFrame")
+    public Response removeThumbFramePic() {
+        List<FrameData> frameDataList = frameDao.getAllFrameData();
+        String newProgramDir = ConfigManagment.PROGRAMETHUMBPICDIR;
+        int newCount = 0;
+        for (FrameData f : frameDataList
+        ) {
+            //迁移原图
+            String thumbImages = f.getThumbImages();
+            if (thumbImages == null || thumbImages.isEmpty()) {
+                continue;
+            }
+            String[] imageStr = thumbImages.split(";");
+            for (String image : imageStr
+            ) {
                 image = image.replaceAll("/images", "");
                 //原始图片地址，picFile
                 File picFile = new File(ConfigManagment.realImagesPath + image);
@@ -132,6 +216,7 @@ public class DataController {
 
     /**
      * 视频
+     *
      * @return
      */
     @GetMapping("/video")
@@ -159,10 +244,10 @@ public class DataController {
                     log.info(videoFile.getAbsolutePath());
                     FileUtil.copyFile(videoFile.getAbsolutePath(), newFile.getAbsolutePath());
                 }
-                    //复制文件
-                } else {
-                    log.info("文件不存在：" + video);
-                }
+                //复制文件
+            } else {
+                log.info("文件不存在：" + video);
+            }
 
         }
         System.out.println(newCount);
